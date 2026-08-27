@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Our Wedding RSVP</title>
+    <style>
+        /* Your total CSS control goes here */
+        body { font-family: sans-serif; max-width: 400px; margin: 50px auto; padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        button { background: #333; color: #fff; padding: 10px 15px; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <!-- Completely customizable HTML structure -->
+    <form id="rsvpForm">
+        <div class="form-group">
+            <label for="guestName">Full Name:</label>
+            <input type="text" id="guestName" required>
+        </div>
+        
+        <div class="form-group">
+            <label>Will you attend?</label>
+            <input type="radio" name="attending" value="Yes" checked> Yes
+            <input type="radio" name="attending" value="No"> No
+        </div>
+
+        <div class="form-group">
+            <label for="dietary">Dietary Restrictions:</label>
+            <input type="text" id="dietary">
+        </div>
+
+        <button type="submit">Submit RSVP</button>
+    </form>
+
+    <script>
+        // Replace this with the URL you copied during the Google Apps Script deployment
+        const WEB_APP_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE';
+
+        document.getElementById('rsvpForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Package form data into a JSON object matching your Apps Script keys
+            const formData = {
+                guestName: document.getElementById('guestName').value,
+                attending: document.querySelector('input[name="attending"]:checked').value,
+                dietary: document.getElementById('dietary').value
+            };
+
+            // Post natively to Google Sheets via standard AJAX/Fetch
+            fetch(WEB_APP_URL, {
+                method: 'POST',
+                mode: 'no-cors', // Bypasses CORS issues with Google Apps Script redirects
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(() => {
+                alert('Thank you! Your RSVP has been recorded.');
+                document.getElementById('rsvpForm').reset();
+            })
+            .catch(err => console.error('Error submitting form:', err));
+        });
+    </script>
+</body>
+</html>
