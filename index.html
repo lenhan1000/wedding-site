@@ -500,9 +500,14 @@ section{padding-block:clamp(3rem,6.5vw,5rem);position:relative}
 }
 
 .pb-book{position:relative;perspective:2100px}
-.pb-desktop .pb-book{width:680px;height:500px}
-.pb-mobile .pb-stage{position:relative;width:315px;height:480px;overflow:hidden}
-.pb-mobile .pb-book{position:absolute;top:10px;left:-235px;width:550px;height:460px}
+.pb-desktop .pb-book{width:clamp(680px,58vw,880px);aspect-ratio:680/500;transition:transform .8s cubic-bezier(.32,.08,.18,1)}
+/* clip-path instead of overflow:hidden: the left page's own stacked-page
+   box-shadow (pb-page-left below) extends past its own edge, and clipping
+   it with a plain overflow box cuts straight through that shadow fringe -
+   a negative left inset clips normally on the other 3 sides but lets the
+   left side bleed into the section background instead of hard-cutting it */
+.pb-mobile .pb-stage{position:relative;width:315px;height:480px;clip-path:inset(0 0 0 -60px)}
+.pb-mobile .pb-book{position:absolute;top:10px;left:-235px;width:550px;height:460px;transition:transform .8s cubic-bezier(.32,.08,.18,1)}
 
 .pb-pages{position:absolute;inset:0;display:grid;grid-template-columns:1fr 1fr}
 .pb-page{position:relative;background:var(--cream);background-image:radial-gradient(rgba(36,28,21,.06) .5px,transparent .5px);background-size:3px 3px;display:flex;align-items:center;justify-content:center;transition:clip-path .45s ease}
@@ -521,6 +526,7 @@ section{padding-block:clamp(3rem,6.5vw,5rem);position:relative}
 
 .pb-photo{position:relative;width:270px;background:var(--sign);padding:8px;box-shadow:0 10px 20px -10px rgba(0,0,0,.4)}
 .pb-mobile .pb-photo{width:230px}
+.pb-desktop .pb-photo{width:92.4658%}
 .pb-frame{position:relative;overflow:hidden}
 .pb-frame img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;filter:sepia(.12) saturate(1.06) contrast(1.03) brightness(1.02)}
 .pb-num{position:absolute;left:6px;bottom:6px;font-family:"Courier New",ui-monospace,monospace;font-size:10px;letter-spacing:.05em;color:var(--sign);text-shadow:0 1px 2px rgba(0,0,0,.6);pointer-events:none}
@@ -538,37 +544,55 @@ section{padding-block:clamp(3rem,6.5vw,5rem);position:relative}
 .pb-turn-next .pb-turn-face{border-radius:0 3px 3px 0}
 .pb-turn-prev .pb-turn-face{border-radius:3px 0 0 3px}
 
-.pb-cover{position:absolute;top:-10px;right:6px;bottom:-10px;border-radius:18px;background:radial-gradient(120% 100% at 30% 15%,#332b24 0%,#171310 42%,#0a0806 78%);box-shadow:inset 5px 6px 12px rgba(255,255,255,.07),inset -10px -12px 26px rgba(0,0,0,.65),0 34px 60px -18px rgba(0,0,0,.75);transform-origin:0% 50%;backface-visibility:hidden;transition:transform .5s cubic-bezier(.32,.08,.18,1);cursor:pointer;overflow:hidden;z-index:10}
-.pb-desktop .pb-cover{width:336px}
+.pb-cover{container-type:inline-size;position:absolute;top:-10px;right:6px;bottom:-10px;border-radius:24px;background:radial-gradient(120% 100% at 30% 15%,#5a4231 0%,#3c2b1f 42%,#1c130d 78%);box-shadow:inset 5px 6px 12px rgba(255,255,255,.07),inset -10px -12px 26px rgba(0,0,0,.65),0 34px 60px -18px rgba(0,0,0,.75);transform-origin:0% 50%;backface-visibility:hidden;transition:transform .5s cubic-bezier(.32,.08,.18,1);cursor:pointer;overflow:hidden;z-index:10}
+.pb-desktop .pb-cover{width:49.4118%}
 .pb-mobile .pb-cover{width:270px}
 .pb-edges{position:absolute;top:0;right:0;bottom:0;width:9px;background:repeating-linear-gradient(180deg,#EFE3C6 0 3px,#E4D6B6 3px 4px);box-shadow:inset 2px 0 4px rgba(0,0,0,.25);border-radius:0 6px 6px 0;z-index:8}
 .pb-edges[hidden]{display:none}
-.pb-coverface{position:absolute;inset:-10px 0 -10px -4px;border-radius:18px;background:radial-gradient(120% 100% at 70% 20%,#332b24 0%,#171310 45%,#0a0806 80%);box-shadow:inset 5px 6px 12px rgba(255,255,255,.07),inset -10px -12px 26px rgba(0,0,0,.65),0 20px 40px -16px rgba(0,0,0,.6)}
+.pb-coverface{container-type:inline-size;position:absolute;top:-10px;bottom:-10px;left:6px;border-radius:24px;background:radial-gradient(120% 100% at 70% 20%,#5a4231 0%,#3c2b1f 45%,#1c130d 80%);box-shadow:inset 5px 6px 12px rgba(255,255,255,.07),inset -10px -12px 26px rgba(0,0,0,.65),0 34px 60px -18px rgba(0,0,0,.75);overflow:hidden;cursor:pointer}
 .pb-coverface[hidden]{display:none}
-.pb-cf-sheen{position:absolute;inset:0;border-radius:18px;background:linear-gradient(115deg,rgba(255,255,255,.12) 0%,transparent 24%,transparent 76%,rgba(255,255,255,.04) 100%);pointer-events:none}
-.pb-cf-spine{position:absolute;right:0;top:10px;bottom:10px;width:13px;border-radius:0 10px 10px 0;background:linear-gradient(90deg,rgba(0,0,0,.3),rgba(255,255,255,.1));pointer-events:none}
+.pb-desktop .pb-coverface{width:49.4118%}
+/* the 49.4118% above is relative to the *full* book width, correct for the
+   static resting coverface (a .pb-pages sibling); the 4 coverface instances
+   still nested inside .pb-turn-face (front/back faces of the flip leaf) sit
+   in a container that's only 50% of the book, so the same percentage there
+   resolves to roughly half the intended size - fill the turn-face instead */
+.pb-desktop .pb-turn-face .pb-coverface{width:100%;left:0}
+.pb-mobile .pb-coverface{width:270px}
+.pb-cf-sheen{position:absolute;inset:0;border-radius:24px;background:linear-gradient(115deg,rgba(255,255,255,.12) 0%,transparent 24%,transparent 76%,rgba(255,255,255,.04) 100%);pointer-events:none}
+.pb-cf-spine{position:absolute;right:0;top:10px;bottom:10px;width:2.99cqw;border-radius:0 10px 10px 0;background:linear-gradient(90deg,rgba(0,0,0,.3),rgba(255,255,255,.1));pointer-events:none}
+.pb-cf-motif{position:absolute;left:50%;top:50%;transform:translate(-50%,-52%);width:23.9cqw;opacity:.16;pointer-events:none}
 .pb-sheen{position:absolute;inset:0;background:linear-gradient(115deg,rgba(255,255,255,.14) 0%,transparent 22%,transparent 78%,rgba(255,255,255,.05) 100%);pointer-events:none}
-.pb-spine{position:absolute;left:0;top:10px;bottom:10px;width:13px;border-radius:10px 0 0 10px;background:linear-gradient(90deg,rgba(255,255,255,.1),rgba(0,0,0,.3));pointer-events:none}
+.pb-spine{position:absolute;left:0;top:10px;bottom:10px;width:2.99cqw;border-radius:10px 0 0 10px;background:linear-gradient(90deg,rgba(255,255,255,.1),rgba(0,0,0,.3));pointer-events:none}
 
+/* sized in cqw (percent of the cover's own width, via container-type:
+   inline-size on .pb-cover/.pb-coverface above) instead of fixed px, so
+   this scales with the cover instead of looking oversized on mobile's
+   270px cover or undersized at desktop's 880px clamp max - ratios kept
+   from the original px values at the ~435px desktop-max cover width */
 .pb-flower{position:absolute;left:50%;top:34%;width:1px;height:1px}
-.pb-petal{position:absolute;left:0;top:0;width:26px;height:50px;margin-left:-13px;margin-top:-50px;border-radius:50%;transform-origin:50% 100%;background:linear-gradient(180deg,#D06A46,var(--crimson));box-shadow:0 0 0 .5px rgba(184,145,47,.5)}
+.pb-petal{position:absolute;left:0;top:0;width:11.3cqw;height:21.7cqw;margin-left:-5.7cqw;margin-top:-21.7cqw;border-radius:50%;transform-origin:50% 100%;background:linear-gradient(180deg,#D06A46,var(--crimson));box-shadow:0 0 0 .5px rgba(184,145,47,.5)}
 .pb-petal.p0{transform:rotate(0deg)}
 .pb-petal.p1{transform:rotate(60deg)}
 .pb-petal.p2{transform:rotate(120deg)}
 .pb-petal.p3{transform:rotate(180deg)}
 .pb-petal.p4{transform:rotate(240deg)}
 .pb-petal.p5{transform:rotate(300deg)}
-.pb-flower-core{position:absolute;left:50%;top:50%;width:14px;height:14px;margin-left:-7px;margin-top:-7px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FBE49A,var(--gold));box-shadow:0 2px 4px rgba(0,0,0,.4)}
-.pb-fleaf{position:absolute;left:0;top:0;width:22px;height:46px;border-radius:50%;transform-origin:50% 100%;background:linear-gradient(180deg,#4a6b40,var(--palmdk))}
-.pb-fleaf.l0{margin-left:-38px;margin-top:-7px;transform:rotate(-46deg)}
-.pb-fleaf.l1{margin-left:16px;margin-top:-7px;transform:rotate(46deg)}
+.pb-flower-core{position:absolute;left:50%;top:50%;width:6.1cqw;height:6.1cqw;margin-left:-3cqw;margin-top:-3cqw;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FBE49A,var(--gold));box-shadow:0 2px 4px rgba(0,0,0,.4)}
+.pb-fleaf{position:absolute;left:0;top:0;width:9.56cqw;height:20cqw;border-radius:50%;transform-origin:50% 100%;background:linear-gradient(180deg,#4a6b40,var(--palmdk))}
+.pb-fleaf.l0{margin-left:-16.5cqw;margin-top:-3cqw;transform:rotate(-46deg)}
+.pb-fleaf.l1{margin-left:6.95cqw;margin-top:-3cqw;transform:rotate(46deg)}
 
 .pb-cover-label{position:absolute;left:50%;top:66%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:9px;pointer-events:none}
-.pb-rule{width:100px;height:1px;background:linear-gradient(90deg,transparent,rgba(184,145,47,.7),transparent)}
-.pb-nameplate{font-family:"Hong Ky",serif;font-size:19px;letter-spacing:.13em;color:#E7D9B4;text-shadow:0 1px 2px rgba(0,0,0,.6);display:flex;flex-direction:column;align-items:center;gap:2px}
-.pb-nameplate .pb-heart{font-size:.7em;opacity:.85}
-.pb-subline{font-family:"Be Vietnam Pro",sans-serif;font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--sepia)}
-.pb-openhint{font-family:"Be Vietnam Pro",sans-serif;font-size:10.5px;font-style:italic;letter-spacing:.03em;color:var(--sepia)}
+.pb-rule{width:43.5cqw;height:1px;background:linear-gradient(90deg,transparent,rgba(184,145,47,.7),transparent)}
+.pb-nameplate{font-family:"Chi Son",serif;font-size:clamp(24px,10.25cqw,45px);letter-spacing:.13em;color:#E7D9B4;text-shadow:0 1px 2px rgba(0,0,0,.6);display:flex;flex-direction:column;align-items:center;gap:2px;white-space:nowrap}
+.pb-nameplate .pb-heart{display:flex;align-items:center;justify-content:center;width:.6em;height:.6em;opacity:.85}
+.pb-nameplate .pb-heart svg{width:100%;height:100%;fill:var(--gold);display:block}
+/* Hong Ky + tabular-nums matches .tl-time's established date/numeral
+   styling elsewhere on the site, instead of the generic sans used before -
+   fits the engraved-plate look of the rest of the cover better */
+.pb-subline{font-family:"Hong Ky",serif;font-variant-numeric:tabular-nums;font-size:clamp(10px,3.05cqw,13px);letter-spacing:.28em;text-transform:uppercase;color:var(--sepia);white-space:nowrap}
+.pb-openhint{font-family:"Hong Ky",serif;font-size:clamp(11px,3.2cqw,14px);font-style:italic;letter-spacing:.03em;color:var(--sepia);white-space:nowrap}
 
 .pb-controls{display:flex;align-items:center;gap:16px}
 .pb-btn{font-family:"Be Vietnam Pro",sans-serif;font-size:19px;width:38px;height:38px;border-radius:50%;border:1.5px solid var(--sepia);background:var(--cream);color:#5b4527;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
@@ -874,12 +898,12 @@ footer a{color:var(--gold)}
         <div class="pb-book">
           <div class="pb-pages">
             <div class="pb-page pb-page-left" data-pb-left hidden>
-              <div class="pb-coverface" data-pb-left-cover hidden><div class="pb-cf-sheen"></div><div class="pb-cf-spine"></div></div>
               <div class="pb-photo" data-pb-left-photo><div class="pb-frame"><img alt=""><span class="pb-num"></span></div></div>
             </div>
             <div class="pb-page pb-page-right" data-pb-right>
               <div class="pb-photo" data-pb-right-photo><div class="pb-frame"><img alt=""><span class="pb-num"></span></div></div>
             </div>
+            <div class="pb-coverface" data-pb-left-cover hidden><div class="pb-cf-sheen"></div><div class="pb-cf-spine"></div><img class="pb-cf-motif" alt="" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20108%20150%22%3E%3Cpath%20d%3D%22M0%2C150%20L0%2C59.8%20L0%2C59.8%20L1%2C58.7%20L2%2C56.5%20L3%2C55.2%20L4%2C53.8%20L5%2C52.7%20L6%2C51.5%20L7%2C50.7%20L8%2C50.0%20L9%2C49.3%20L10%2C48.8%20L11%2C48.2%20L12%2C47.8%20L13%2C47.3%20L14%2C46.8%20L15%2C45.5%20L16%2C43.2%20L17%2C40.5%20L18%2C38.2%20L19%2C36.5%20L20%2C35.2%20L21%2C34.0%20L22%2C33.2%20L23%2C32.3%20L24%2C31.5%20L25%2C30.8%20L26%2C30.3%20L27%2C30.0%20L28%2C29.5%20L29%2C29.2%20L30%2C29.0%20L31%2C29.0%20L32%2C28.8%20L33%2C28.2%20L34%2C26.8%20L35%2C24.8%20L36%2C22.8%20L37%2C21.0%20L38%2C19.7%20L39%2C18.5%20L40%2C17.5%20L41%2C16.7%20L42%2C16.0%20L43%2C15.3%20L44%2C14.8%20L45%2C14.2%20L46%2C13.8%20L47%2C13.3%20L48%2C13.0%20L49%2C12.7%20L50%2C12.3%20L51%2C12.2%20L52%2C12.0%20L53%2C12.0%20L54%2C12.0%20L55%2C12.0%20L56%2C12.0%20L57%2C12.2%20L58%2C12.3%20L59%2C12.7%20L60%2C13.0%20L61%2C13.3%20L62%2C13.8%20L63%2C14.2%20L64%2C14.8%20L65%2C15.3%20L66%2C16.0%20L67%2C16.7%20L68%2C17.5%20L69%2C18.5%20L70%2C19.7%20L71%2C21.0%20L72%2C22.8%20L73%2C24.8%20L74%2C26.8%20L75%2C28.2%20L76%2C28.8%20L77%2C29.0%20L78%2C29.0%20L79%2C29.2%20L80%2C29.5%20L81%2C30.0%20L82%2C30.3%20L83%2C30.8%20L84%2C31.5%20L85%2C32.3%20L86%2C33.2%20L87%2C34.0%20L88%2C35.2%20L89%2C36.5%20L90%2C38.2%20L91%2C40.5%20L92%2C43.2%20L93%2C45.5%20L94%2C46.8%20L95%2C47.3%20L96%2C47.8%20L97%2C48.2%20L98%2C48.8%20L99%2C49.3%20L100%2C50.0%20L101%2C50.7%20L102%2C51.5%20L103%2C52.7%20L104%2C53.8%20L105%2C55.2%20L106%2C56.5%20L107%2C58.7%20L108%2C59.8%20L108%2C150%20Z%22%20fill%3D%22none%22%20stroke%3D%22%23E7D9B4%22%20stroke-width%3D%222.5%22%2F%3E%3C%2Fsvg%3E"></div>
             <div class="pb-gutter"></div>
             <div class="pb-stitch a" data-pb-stitch="a"></div>
             <div class="pb-stitch b" data-pb-stitch="b1"></div>
@@ -889,21 +913,21 @@ footer a{color:var(--gold)}
             <div class="pb-cord-strap" data-pb-cordstrap></div>
             <div class="pb-turn pb-turn-next" data-pb-turn-next hidden>
               <div class="pb-turn-face front">
-                <div class="pb-coverface" data-pb-turn-next-front-cover hidden><div class="pb-cf-sheen"></div><div class="pb-cf-spine"></div></div>
+                <div class="pb-coverface" data-pb-turn-next-front-cover hidden><div class="pb-cf-sheen"></div><div class="pb-cf-spine"></div><img class="pb-cf-motif" alt="" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20108%20150%22%3E%3Cpath%20d%3D%22M0%2C150%20L0%2C59.8%20L0%2C59.8%20L1%2C58.7%20L2%2C56.5%20L3%2C55.2%20L4%2C53.8%20L5%2C52.7%20L6%2C51.5%20L7%2C50.7%20L8%2C50.0%20L9%2C49.3%20L10%2C48.8%20L11%2C48.2%20L12%2C47.8%20L13%2C47.3%20L14%2C46.8%20L15%2C45.5%20L16%2C43.2%20L17%2C40.5%20L18%2C38.2%20L19%2C36.5%20L20%2C35.2%20L21%2C34.0%20L22%2C33.2%20L23%2C32.3%20L24%2C31.5%20L25%2C30.8%20L26%2C30.3%20L27%2C30.0%20L28%2C29.5%20L29%2C29.2%20L30%2C29.0%20L31%2C29.0%20L32%2C28.8%20L33%2C28.2%20L34%2C26.8%20L35%2C24.8%20L36%2C22.8%20L37%2C21.0%20L38%2C19.7%20L39%2C18.5%20L40%2C17.5%20L41%2C16.7%20L42%2C16.0%20L43%2C15.3%20L44%2C14.8%20L45%2C14.2%20L46%2C13.8%20L47%2C13.3%20L48%2C13.0%20L49%2C12.7%20L50%2C12.3%20L51%2C12.2%20L52%2C12.0%20L53%2C12.0%20L54%2C12.0%20L55%2C12.0%20L56%2C12.0%20L57%2C12.2%20L58%2C12.3%20L59%2C12.7%20L60%2C13.0%20L61%2C13.3%20L62%2C13.8%20L63%2C14.2%20L64%2C14.8%20L65%2C15.3%20L66%2C16.0%20L67%2C16.7%20L68%2C17.5%20L69%2C18.5%20L70%2C19.7%20L71%2C21.0%20L72%2C22.8%20L73%2C24.8%20L74%2C26.8%20L75%2C28.2%20L76%2C28.8%20L77%2C29.0%20L78%2C29.0%20L79%2C29.2%20L80%2C29.5%20L81%2C30.0%20L82%2C30.3%20L83%2C30.8%20L84%2C31.5%20L85%2C32.3%20L86%2C33.2%20L87%2C34.0%20L88%2C35.2%20L89%2C36.5%20L90%2C38.2%20L91%2C40.5%20L92%2C43.2%20L93%2C45.5%20L94%2C46.8%20L95%2C47.3%20L96%2C47.8%20L97%2C48.2%20L98%2C48.8%20L99%2C49.3%20L100%2C50.0%20L101%2C50.7%20L102%2C51.5%20L103%2C52.7%20L104%2C53.8%20L105%2C55.2%20L106%2C56.5%20L107%2C58.7%20L108%2C59.8%20L108%2C150%20Z%22%20fill%3D%22none%22%20stroke%3D%22%23E7D9B4%22%20stroke-width%3D%222.5%22%2F%3E%3C%2Fsvg%3E"></div>
                 <div class="pb-photo" data-pb-turn-next-front-photo><div class="pb-frame"><img alt=""><span class="pb-num"></span></div></div>
               </div>
               <div class="pb-turn-face back">
-                <div class="pb-coverface" data-pb-turn-next-back-cover hidden><div class="pb-cf-sheen"></div><div class="pb-cf-spine"></div></div>
+                <div class="pb-coverface" data-pb-turn-next-back-cover hidden><div class="pb-cf-sheen"></div><div class="pb-cf-spine"></div><img class="pb-cf-motif" alt="" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20108%20150%22%3E%3Cpath%20d%3D%22M0%2C150%20L0%2C59.8%20L0%2C59.8%20L1%2C58.7%20L2%2C56.5%20L3%2C55.2%20L4%2C53.8%20L5%2C52.7%20L6%2C51.5%20L7%2C50.7%20L8%2C50.0%20L9%2C49.3%20L10%2C48.8%20L11%2C48.2%20L12%2C47.8%20L13%2C47.3%20L14%2C46.8%20L15%2C45.5%20L16%2C43.2%20L17%2C40.5%20L18%2C38.2%20L19%2C36.5%20L20%2C35.2%20L21%2C34.0%20L22%2C33.2%20L23%2C32.3%20L24%2C31.5%20L25%2C30.8%20L26%2C30.3%20L27%2C30.0%20L28%2C29.5%20L29%2C29.2%20L30%2C29.0%20L31%2C29.0%20L32%2C28.8%20L33%2C28.2%20L34%2C26.8%20L35%2C24.8%20L36%2C22.8%20L37%2C21.0%20L38%2C19.7%20L39%2C18.5%20L40%2C17.5%20L41%2C16.7%20L42%2C16.0%20L43%2C15.3%20L44%2C14.8%20L45%2C14.2%20L46%2C13.8%20L47%2C13.3%20L48%2C13.0%20L49%2C12.7%20L50%2C12.3%20L51%2C12.2%20L52%2C12.0%20L53%2C12.0%20L54%2C12.0%20L55%2C12.0%20L56%2C12.0%20L57%2C12.2%20L58%2C12.3%20L59%2C12.7%20L60%2C13.0%20L61%2C13.3%20L62%2C13.8%20L63%2C14.2%20L64%2C14.8%20L65%2C15.3%20L66%2C16.0%20L67%2C16.7%20L68%2C17.5%20L69%2C18.5%20L70%2C19.7%20L71%2C21.0%20L72%2C22.8%20L73%2C24.8%20L74%2C26.8%20L75%2C28.2%20L76%2C28.8%20L77%2C29.0%20L78%2C29.0%20L79%2C29.2%20L80%2C29.5%20L81%2C30.0%20L82%2C30.3%20L83%2C30.8%20L84%2C31.5%20L85%2C32.3%20L86%2C33.2%20L87%2C34.0%20L88%2C35.2%20L89%2C36.5%20L90%2C38.2%20L91%2C40.5%20L92%2C43.2%20L93%2C45.5%20L94%2C46.8%20L95%2C47.3%20L96%2C47.8%20L97%2C48.2%20L98%2C48.8%20L99%2C49.3%20L100%2C50.0%20L101%2C50.7%20L102%2C51.5%20L103%2C52.7%20L104%2C53.8%20L105%2C55.2%20L106%2C56.5%20L107%2C58.7%20L108%2C59.8%20L108%2C150%20Z%22%20fill%3D%22none%22%20stroke%3D%22%23E7D9B4%22%20stroke-width%3D%222.5%22%2F%3E%3C%2Fsvg%3E"></div>
                 <div class="pb-photo" data-pb-turn-next-back-photo><div class="pb-frame"><img alt=""><span class="pb-num"></span></div></div>
               </div>
             </div>
             <div class="pb-turn pb-turn-prev" data-pb-turn-prev hidden>
               <div class="pb-turn-face front">
-                <div class="pb-coverface" data-pb-turn-prev-front-cover hidden><div class="pb-cf-sheen"></div><div class="pb-cf-spine"></div></div>
+                <div class="pb-coverface" data-pb-turn-prev-front-cover hidden><div class="pb-cf-sheen"></div><div class="pb-cf-spine"></div><img class="pb-cf-motif" alt="" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20108%20150%22%3E%3Cpath%20d%3D%22M0%2C150%20L0%2C59.8%20L0%2C59.8%20L1%2C58.7%20L2%2C56.5%20L3%2C55.2%20L4%2C53.8%20L5%2C52.7%20L6%2C51.5%20L7%2C50.7%20L8%2C50.0%20L9%2C49.3%20L10%2C48.8%20L11%2C48.2%20L12%2C47.8%20L13%2C47.3%20L14%2C46.8%20L15%2C45.5%20L16%2C43.2%20L17%2C40.5%20L18%2C38.2%20L19%2C36.5%20L20%2C35.2%20L21%2C34.0%20L22%2C33.2%20L23%2C32.3%20L24%2C31.5%20L25%2C30.8%20L26%2C30.3%20L27%2C30.0%20L28%2C29.5%20L29%2C29.2%20L30%2C29.0%20L31%2C29.0%20L32%2C28.8%20L33%2C28.2%20L34%2C26.8%20L35%2C24.8%20L36%2C22.8%20L37%2C21.0%20L38%2C19.7%20L39%2C18.5%20L40%2C17.5%20L41%2C16.7%20L42%2C16.0%20L43%2C15.3%20L44%2C14.8%20L45%2C14.2%20L46%2C13.8%20L47%2C13.3%20L48%2C13.0%20L49%2C12.7%20L50%2C12.3%20L51%2C12.2%20L52%2C12.0%20L53%2C12.0%20L54%2C12.0%20L55%2C12.0%20L56%2C12.0%20L57%2C12.2%20L58%2C12.3%20L59%2C12.7%20L60%2C13.0%20L61%2C13.3%20L62%2C13.8%20L63%2C14.2%20L64%2C14.8%20L65%2C15.3%20L66%2C16.0%20L67%2C16.7%20L68%2C17.5%20L69%2C18.5%20L70%2C19.7%20L71%2C21.0%20L72%2C22.8%20L73%2C24.8%20L74%2C26.8%20L75%2C28.2%20L76%2C28.8%20L77%2C29.0%20L78%2C29.0%20L79%2C29.2%20L80%2C29.5%20L81%2C30.0%20L82%2C30.3%20L83%2C30.8%20L84%2C31.5%20L85%2C32.3%20L86%2C33.2%20L87%2C34.0%20L88%2C35.2%20L89%2C36.5%20L90%2C38.2%20L91%2C40.5%20L92%2C43.2%20L93%2C45.5%20L94%2C46.8%20L95%2C47.3%20L96%2C47.8%20L97%2C48.2%20L98%2C48.8%20L99%2C49.3%20L100%2C50.0%20L101%2C50.7%20L102%2C51.5%20L103%2C52.7%20L104%2C53.8%20L105%2C55.2%20L106%2C56.5%20L107%2C58.7%20L108%2C59.8%20L108%2C150%20Z%22%20fill%3D%22none%22%20stroke%3D%22%23E7D9B4%22%20stroke-width%3D%222.5%22%2F%3E%3C%2Fsvg%3E"></div>
                 <div class="pb-photo" data-pb-turn-prev-front-photo><div class="pb-frame"><img alt=""><span class="pb-num"></span></div></div>
               </div>
               <div class="pb-turn-face back">
-                <div class="pb-coverface" data-pb-turn-prev-back-cover hidden><div class="pb-cf-sheen"></div><div class="pb-cf-spine"></div></div>
+                <div class="pb-coverface" data-pb-turn-prev-back-cover hidden><div class="pb-cf-sheen"></div><div class="pb-cf-spine"></div><img class="pb-cf-motif" alt="" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20108%20150%22%3E%3Cpath%20d%3D%22M0%2C150%20L0%2C59.8%20L0%2C59.8%20L1%2C58.7%20L2%2C56.5%20L3%2C55.2%20L4%2C53.8%20L5%2C52.7%20L6%2C51.5%20L7%2C50.7%20L8%2C50.0%20L9%2C49.3%20L10%2C48.8%20L11%2C48.2%20L12%2C47.8%20L13%2C47.3%20L14%2C46.8%20L15%2C45.5%20L16%2C43.2%20L17%2C40.5%20L18%2C38.2%20L19%2C36.5%20L20%2C35.2%20L21%2C34.0%20L22%2C33.2%20L23%2C32.3%20L24%2C31.5%20L25%2C30.8%20L26%2C30.3%20L27%2C30.0%20L28%2C29.5%20L29%2C29.2%20L30%2C29.0%20L31%2C29.0%20L32%2C28.8%20L33%2C28.2%20L34%2C26.8%20L35%2C24.8%20L36%2C22.8%20L37%2C21.0%20L38%2C19.7%20L39%2C18.5%20L40%2C17.5%20L41%2C16.7%20L42%2C16.0%20L43%2C15.3%20L44%2C14.8%20L45%2C14.2%20L46%2C13.8%20L47%2C13.3%20L48%2C13.0%20L49%2C12.7%20L50%2C12.3%20L51%2C12.2%20L52%2C12.0%20L53%2C12.0%20L54%2C12.0%20L55%2C12.0%20L56%2C12.0%20L57%2C12.2%20L58%2C12.3%20L59%2C12.7%20L60%2C13.0%20L61%2C13.3%20L62%2C13.8%20L63%2C14.2%20L64%2C14.8%20L65%2C15.3%20L66%2C16.0%20L67%2C16.7%20L68%2C17.5%20L69%2C18.5%20L70%2C19.7%20L71%2C21.0%20L72%2C22.8%20L73%2C24.8%20L74%2C26.8%20L75%2C28.2%20L76%2C28.8%20L77%2C29.0%20L78%2C29.0%20L79%2C29.2%20L80%2C29.5%20L81%2C30.0%20L82%2C30.3%20L83%2C30.8%20L84%2C31.5%20L85%2C32.3%20L86%2C33.2%20L87%2C34.0%20L88%2C35.2%20L89%2C36.5%20L90%2C38.2%20L91%2C40.5%20L92%2C43.2%20L93%2C45.5%20L94%2C46.8%20L95%2C47.3%20L96%2C47.8%20L97%2C48.2%20L98%2C48.8%20L99%2C49.3%20L100%2C50.0%20L101%2C50.7%20L102%2C51.5%20L103%2C52.7%20L104%2C53.8%20L105%2C55.2%20L106%2C56.5%20L107%2C58.7%20L108%2C59.8%20L108%2C150%20Z%22%20fill%3D%22none%22%20stroke%3D%22%23E7D9B4%22%20stroke-width%3D%222.5%22%2F%3E%3C%2Fsvg%3E"></div>
                 <div class="pb-photo" data-pb-turn-prev-back-photo><div class="pb-frame"><img alt=""><span class="pb-num"></span></div></div>
               </div>
             </div>
@@ -925,7 +949,7 @@ footer a{color:var(--gold)}
             </div>
             <div class="pb-cover-label">
               <div class="pb-rule"></div>
-              <div class="pb-nameplate"><span>NH&Acirc;N</span><span class="pb-heart">&hearts;</span><span>NG&Acirc;N</span></div>
+              <div class="pb-nameplate"><span>NH&Acirc;N</span><span class="pb-heart"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M5,35 L22,12 L42,12 L50,28 L58,12 L78,12 L95,35 L50,98 Z"/></svg></span><span>NG&Acirc;N</span></div>
               <div class="pb-subline">12 &middot; 12 &middot; 2026</div>
               <div class="pb-rule"></div>
               <div class="pb-openhint" data-i18n="gal.openHint">ch&#7841;m &#273;&#7875; m&#7903;</div>
@@ -943,12 +967,11 @@ footer a{color:var(--gold)}
         <div class="pb-stage">
           <div class="pb-book">
             <div class="pb-pages">
-              <div class="pb-page pb-page-left" data-pb-left hidden>
-                <div class="pb-coverface" data-pb-left-cover hidden><div class="pb-cf-sheen"></div><div class="pb-cf-spine"></div></div>
-              </div>
+              <div class="pb-page pb-page-left" data-pb-left hidden></div>
               <div class="pb-page pb-page-right" data-pb-right>
                 <div class="pb-photo" data-pb-right-photo><div class="pb-frame"><img alt=""><span class="pb-num"></span></div></div>
               </div>
+              <div class="pb-coverface" data-pb-left-cover hidden><div class="pb-cf-sheen"></div><div class="pb-cf-spine"></div><img class="pb-cf-motif" alt="" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20108%20150%22%3E%3Cpath%20d%3D%22M0%2C150%20L0%2C59.8%20L0%2C59.8%20L1%2C58.7%20L2%2C56.5%20L3%2C55.2%20L4%2C53.8%20L5%2C52.7%20L6%2C51.5%20L7%2C50.7%20L8%2C50.0%20L9%2C49.3%20L10%2C48.8%20L11%2C48.2%20L12%2C47.8%20L13%2C47.3%20L14%2C46.8%20L15%2C45.5%20L16%2C43.2%20L17%2C40.5%20L18%2C38.2%20L19%2C36.5%20L20%2C35.2%20L21%2C34.0%20L22%2C33.2%20L23%2C32.3%20L24%2C31.5%20L25%2C30.8%20L26%2C30.3%20L27%2C30.0%20L28%2C29.5%20L29%2C29.2%20L30%2C29.0%20L31%2C29.0%20L32%2C28.8%20L33%2C28.2%20L34%2C26.8%20L35%2C24.8%20L36%2C22.8%20L37%2C21.0%20L38%2C19.7%20L39%2C18.5%20L40%2C17.5%20L41%2C16.7%20L42%2C16.0%20L43%2C15.3%20L44%2C14.8%20L45%2C14.2%20L46%2C13.8%20L47%2C13.3%20L48%2C13.0%20L49%2C12.7%20L50%2C12.3%20L51%2C12.2%20L52%2C12.0%20L53%2C12.0%20L54%2C12.0%20L55%2C12.0%20L56%2C12.0%20L57%2C12.2%20L58%2C12.3%20L59%2C12.7%20L60%2C13.0%20L61%2C13.3%20L62%2C13.8%20L63%2C14.2%20L64%2C14.8%20L65%2C15.3%20L66%2C16.0%20L67%2C16.7%20L68%2C17.5%20L69%2C18.5%20L70%2C19.7%20L71%2C21.0%20L72%2C22.8%20L73%2C24.8%20L74%2C26.8%20L75%2C28.2%20L76%2C28.8%20L77%2C29.0%20L78%2C29.0%20L79%2C29.2%20L80%2C29.5%20L81%2C30.0%20L82%2C30.3%20L83%2C30.8%20L84%2C31.5%20L85%2C32.3%20L86%2C33.2%20L87%2C34.0%20L88%2C35.2%20L89%2C36.5%20L90%2C38.2%20L91%2C40.5%20L92%2C43.2%20L93%2C45.5%20L94%2C46.8%20L95%2C47.3%20L96%2C47.8%20L97%2C48.2%20L98%2C48.8%20L99%2C49.3%20L100%2C50.0%20L101%2C50.7%20L102%2C51.5%20L103%2C52.7%20L104%2C53.8%20L105%2C55.2%20L106%2C56.5%20L107%2C58.7%20L108%2C59.8%20L108%2C150%20Z%22%20fill%3D%22none%22%20stroke%3D%22%23E7D9B4%22%20stroke-width%3D%222.5%22%2F%3E%3C%2Fsvg%3E"></div>
               <div class="pb-gutter"></div>
               <div class="pb-stitch a" data-pb-stitch="a"></div>
               <div class="pb-stitch b" data-pb-stitch="b1"></div>
@@ -958,19 +981,19 @@ footer a{color:var(--gold)}
               <div class="pb-cord-strap" data-pb-cordstrap></div>
               <div class="pb-turn pb-turn-next" data-pb-turn-next hidden>
                 <div class="pb-turn-face front">
-                  <div class="pb-coverface" data-pb-turn-next-front-cover hidden><div class="pb-cf-sheen"></div><div class="pb-cf-spine"></div></div>
+                  <div class="pb-coverface" data-pb-turn-next-front-cover hidden><div class="pb-cf-sheen"></div><div class="pb-cf-spine"></div><img class="pb-cf-motif" alt="" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20108%20150%22%3E%3Cpath%20d%3D%22M0%2C150%20L0%2C59.8%20L0%2C59.8%20L1%2C58.7%20L2%2C56.5%20L3%2C55.2%20L4%2C53.8%20L5%2C52.7%20L6%2C51.5%20L7%2C50.7%20L8%2C50.0%20L9%2C49.3%20L10%2C48.8%20L11%2C48.2%20L12%2C47.8%20L13%2C47.3%20L14%2C46.8%20L15%2C45.5%20L16%2C43.2%20L17%2C40.5%20L18%2C38.2%20L19%2C36.5%20L20%2C35.2%20L21%2C34.0%20L22%2C33.2%20L23%2C32.3%20L24%2C31.5%20L25%2C30.8%20L26%2C30.3%20L27%2C30.0%20L28%2C29.5%20L29%2C29.2%20L30%2C29.0%20L31%2C29.0%20L32%2C28.8%20L33%2C28.2%20L34%2C26.8%20L35%2C24.8%20L36%2C22.8%20L37%2C21.0%20L38%2C19.7%20L39%2C18.5%20L40%2C17.5%20L41%2C16.7%20L42%2C16.0%20L43%2C15.3%20L44%2C14.8%20L45%2C14.2%20L46%2C13.8%20L47%2C13.3%20L48%2C13.0%20L49%2C12.7%20L50%2C12.3%20L51%2C12.2%20L52%2C12.0%20L53%2C12.0%20L54%2C12.0%20L55%2C12.0%20L56%2C12.0%20L57%2C12.2%20L58%2C12.3%20L59%2C12.7%20L60%2C13.0%20L61%2C13.3%20L62%2C13.8%20L63%2C14.2%20L64%2C14.8%20L65%2C15.3%20L66%2C16.0%20L67%2C16.7%20L68%2C17.5%20L69%2C18.5%20L70%2C19.7%20L71%2C21.0%20L72%2C22.8%20L73%2C24.8%20L74%2C26.8%20L75%2C28.2%20L76%2C28.8%20L77%2C29.0%20L78%2C29.0%20L79%2C29.2%20L80%2C29.5%20L81%2C30.0%20L82%2C30.3%20L83%2C30.8%20L84%2C31.5%20L85%2C32.3%20L86%2C33.2%20L87%2C34.0%20L88%2C35.2%20L89%2C36.5%20L90%2C38.2%20L91%2C40.5%20L92%2C43.2%20L93%2C45.5%20L94%2C46.8%20L95%2C47.3%20L96%2C47.8%20L97%2C48.2%20L98%2C48.8%20L99%2C49.3%20L100%2C50.0%20L101%2C50.7%20L102%2C51.5%20L103%2C52.7%20L104%2C53.8%20L105%2C55.2%20L106%2C56.5%20L107%2C58.7%20L108%2C59.8%20L108%2C150%20Z%22%20fill%3D%22none%22%20stroke%3D%22%23E7D9B4%22%20stroke-width%3D%222.5%22%2F%3E%3C%2Fsvg%3E"></div>
                   <div class="pb-photo" data-pb-turn-next-front-photo><div class="pb-frame"><img alt=""><span class="pb-num"></span></div></div>
                 </div>
                 <div class="pb-turn-face back">
-                  <div class="pb-coverface" data-pb-turn-next-back-cover hidden><div class="pb-cf-sheen"></div><div class="pb-cf-spine"></div></div>
+                  <div class="pb-coverface" data-pb-turn-next-back-cover hidden><div class="pb-cf-sheen"></div><div class="pb-cf-spine"></div><img class="pb-cf-motif" alt="" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20108%20150%22%3E%3Cpath%20d%3D%22M0%2C150%20L0%2C59.8%20L0%2C59.8%20L1%2C58.7%20L2%2C56.5%20L3%2C55.2%20L4%2C53.8%20L5%2C52.7%20L6%2C51.5%20L7%2C50.7%20L8%2C50.0%20L9%2C49.3%20L10%2C48.8%20L11%2C48.2%20L12%2C47.8%20L13%2C47.3%20L14%2C46.8%20L15%2C45.5%20L16%2C43.2%20L17%2C40.5%20L18%2C38.2%20L19%2C36.5%20L20%2C35.2%20L21%2C34.0%20L22%2C33.2%20L23%2C32.3%20L24%2C31.5%20L25%2C30.8%20L26%2C30.3%20L27%2C30.0%20L28%2C29.5%20L29%2C29.2%20L30%2C29.0%20L31%2C29.0%20L32%2C28.8%20L33%2C28.2%20L34%2C26.8%20L35%2C24.8%20L36%2C22.8%20L37%2C21.0%20L38%2C19.7%20L39%2C18.5%20L40%2C17.5%20L41%2C16.7%20L42%2C16.0%20L43%2C15.3%20L44%2C14.8%20L45%2C14.2%20L46%2C13.8%20L47%2C13.3%20L48%2C13.0%20L49%2C12.7%20L50%2C12.3%20L51%2C12.2%20L52%2C12.0%20L53%2C12.0%20L54%2C12.0%20L55%2C12.0%20L56%2C12.0%20L57%2C12.2%20L58%2C12.3%20L59%2C12.7%20L60%2C13.0%20L61%2C13.3%20L62%2C13.8%20L63%2C14.2%20L64%2C14.8%20L65%2C15.3%20L66%2C16.0%20L67%2C16.7%20L68%2C17.5%20L69%2C18.5%20L70%2C19.7%20L71%2C21.0%20L72%2C22.8%20L73%2C24.8%20L74%2C26.8%20L75%2C28.2%20L76%2C28.8%20L77%2C29.0%20L78%2C29.0%20L79%2C29.2%20L80%2C29.5%20L81%2C30.0%20L82%2C30.3%20L83%2C30.8%20L84%2C31.5%20L85%2C32.3%20L86%2C33.2%20L87%2C34.0%20L88%2C35.2%20L89%2C36.5%20L90%2C38.2%20L91%2C40.5%20L92%2C43.2%20L93%2C45.5%20L94%2C46.8%20L95%2C47.3%20L96%2C47.8%20L97%2C48.2%20L98%2C48.8%20L99%2C49.3%20L100%2C50.0%20L101%2C50.7%20L102%2C51.5%20L103%2C52.7%20L104%2C53.8%20L105%2C55.2%20L106%2C56.5%20L107%2C58.7%20L108%2C59.8%20L108%2C150%20Z%22%20fill%3D%22none%22%20stroke%3D%22%23E7D9B4%22%20stroke-width%3D%222.5%22%2F%3E%3C%2Fsvg%3E"></div>
                 </div>
               </div>
               <div class="pb-turn pb-turn-prev" data-pb-turn-prev hidden>
                 <div class="pb-turn-face front">
-                  <div class="pb-coverface" data-pb-turn-prev-front-cover hidden><div class="pb-cf-sheen"></div><div class="pb-cf-spine"></div></div>
+                  <div class="pb-coverface" data-pb-turn-prev-front-cover hidden><div class="pb-cf-sheen"></div><div class="pb-cf-spine"></div><img class="pb-cf-motif" alt="" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20108%20150%22%3E%3Cpath%20d%3D%22M0%2C150%20L0%2C59.8%20L0%2C59.8%20L1%2C58.7%20L2%2C56.5%20L3%2C55.2%20L4%2C53.8%20L5%2C52.7%20L6%2C51.5%20L7%2C50.7%20L8%2C50.0%20L9%2C49.3%20L10%2C48.8%20L11%2C48.2%20L12%2C47.8%20L13%2C47.3%20L14%2C46.8%20L15%2C45.5%20L16%2C43.2%20L17%2C40.5%20L18%2C38.2%20L19%2C36.5%20L20%2C35.2%20L21%2C34.0%20L22%2C33.2%20L23%2C32.3%20L24%2C31.5%20L25%2C30.8%20L26%2C30.3%20L27%2C30.0%20L28%2C29.5%20L29%2C29.2%20L30%2C29.0%20L31%2C29.0%20L32%2C28.8%20L33%2C28.2%20L34%2C26.8%20L35%2C24.8%20L36%2C22.8%20L37%2C21.0%20L38%2C19.7%20L39%2C18.5%20L40%2C17.5%20L41%2C16.7%20L42%2C16.0%20L43%2C15.3%20L44%2C14.8%20L45%2C14.2%20L46%2C13.8%20L47%2C13.3%20L48%2C13.0%20L49%2C12.7%20L50%2C12.3%20L51%2C12.2%20L52%2C12.0%20L53%2C12.0%20L54%2C12.0%20L55%2C12.0%20L56%2C12.0%20L57%2C12.2%20L58%2C12.3%20L59%2C12.7%20L60%2C13.0%20L61%2C13.3%20L62%2C13.8%20L63%2C14.2%20L64%2C14.8%20L65%2C15.3%20L66%2C16.0%20L67%2C16.7%20L68%2C17.5%20L69%2C18.5%20L70%2C19.7%20L71%2C21.0%20L72%2C22.8%20L73%2C24.8%20L74%2C26.8%20L75%2C28.2%20L76%2C28.8%20L77%2C29.0%20L78%2C29.0%20L79%2C29.2%20L80%2C29.5%20L81%2C30.0%20L82%2C30.3%20L83%2C30.8%20L84%2C31.5%20L85%2C32.3%20L86%2C33.2%20L87%2C34.0%20L88%2C35.2%20L89%2C36.5%20L90%2C38.2%20L91%2C40.5%20L92%2C43.2%20L93%2C45.5%20L94%2C46.8%20L95%2C47.3%20L96%2C47.8%20L97%2C48.2%20L98%2C48.8%20L99%2C49.3%20L100%2C50.0%20L101%2C50.7%20L102%2C51.5%20L103%2C52.7%20L104%2C53.8%20L105%2C55.2%20L106%2C56.5%20L107%2C58.7%20L108%2C59.8%20L108%2C150%20Z%22%20fill%3D%22none%22%20stroke%3D%22%23E7D9B4%22%20stroke-width%3D%222.5%22%2F%3E%3C%2Fsvg%3E"></div>
                 </div>
                 <div class="pb-turn-face back">
-                  <div class="pb-coverface" data-pb-turn-prev-back-cover hidden><div class="pb-cf-sheen"></div><div class="pb-cf-spine"></div></div>
+                  <div class="pb-coverface" data-pb-turn-prev-back-cover hidden><div class="pb-cf-sheen"></div><div class="pb-cf-spine"></div><img class="pb-cf-motif" alt="" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20108%20150%22%3E%3Cpath%20d%3D%22M0%2C150%20L0%2C59.8%20L0%2C59.8%20L1%2C58.7%20L2%2C56.5%20L3%2C55.2%20L4%2C53.8%20L5%2C52.7%20L6%2C51.5%20L7%2C50.7%20L8%2C50.0%20L9%2C49.3%20L10%2C48.8%20L11%2C48.2%20L12%2C47.8%20L13%2C47.3%20L14%2C46.8%20L15%2C45.5%20L16%2C43.2%20L17%2C40.5%20L18%2C38.2%20L19%2C36.5%20L20%2C35.2%20L21%2C34.0%20L22%2C33.2%20L23%2C32.3%20L24%2C31.5%20L25%2C30.8%20L26%2C30.3%20L27%2C30.0%20L28%2C29.5%20L29%2C29.2%20L30%2C29.0%20L31%2C29.0%20L32%2C28.8%20L33%2C28.2%20L34%2C26.8%20L35%2C24.8%20L36%2C22.8%20L37%2C21.0%20L38%2C19.7%20L39%2C18.5%20L40%2C17.5%20L41%2C16.7%20L42%2C16.0%20L43%2C15.3%20L44%2C14.8%20L45%2C14.2%20L46%2C13.8%20L47%2C13.3%20L48%2C13.0%20L49%2C12.7%20L50%2C12.3%20L51%2C12.2%20L52%2C12.0%20L53%2C12.0%20L54%2C12.0%20L55%2C12.0%20L56%2C12.0%20L57%2C12.2%20L58%2C12.3%20L59%2C12.7%20L60%2C13.0%20L61%2C13.3%20L62%2C13.8%20L63%2C14.2%20L64%2C14.8%20L65%2C15.3%20L66%2C16.0%20L67%2C16.7%20L68%2C17.5%20L69%2C18.5%20L70%2C19.7%20L71%2C21.0%20L72%2C22.8%20L73%2C24.8%20L74%2C26.8%20L75%2C28.2%20L76%2C28.8%20L77%2C29.0%20L78%2C29.0%20L79%2C29.2%20L80%2C29.5%20L81%2C30.0%20L82%2C30.3%20L83%2C30.8%20L84%2C31.5%20L85%2C32.3%20L86%2C33.2%20L87%2C34.0%20L88%2C35.2%20L89%2C36.5%20L90%2C38.2%20L91%2C40.5%20L92%2C43.2%20L93%2C45.5%20L94%2C46.8%20L95%2C47.3%20L96%2C47.8%20L97%2C48.2%20L98%2C48.8%20L99%2C49.3%20L100%2C50.0%20L101%2C50.7%20L102%2C51.5%20L103%2C52.7%20L104%2C53.8%20L105%2C55.2%20L106%2C56.5%20L107%2C58.7%20L108%2C59.8%20L108%2C150%20Z%22%20fill%3D%22none%22%20stroke%3D%22%23E7D9B4%22%20stroke-width%3D%222.5%22%2F%3E%3C%2Fsvg%3E"></div>
                   <div class="pb-photo" data-pb-turn-prev-back-photo><div class="pb-frame"><img alt=""><span class="pb-num"></span></div></div>
                 </div>
               </div>
@@ -992,7 +1015,7 @@ footer a{color:var(--gold)}
               </div>
               <div class="pb-cover-label">
                 <div class="pb-rule"></div>
-                <div class="pb-nameplate"><span>NH&Acirc;N</span><span class="pb-heart">&hearts;</span><span>NG&Acirc;N</span></div>
+                <div class="pb-nameplate"><span>NH&Acirc;N</span><span class="pb-heart"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M5,35 L22,12 L42,12 L50,28 L58,12 L78,12 L95,35 L50,98 Z"/></svg></span><span>NG&Acirc;N</span></div>
                 <div class="pb-subline">12 &middot; 12 &middot; 2026</div>
                 <div class="pb-rule"></div>
                 <div class="pb-openhint" data-i18n="gal.openHint">ch&#7841;m &#273;&#7875; m&#7903;</div>
@@ -1214,7 +1237,48 @@ footer a{color:var(--gold)}
       ? [[0,1],[2,3],[4,5]]
       : photos.map(function(_, i){ return [i, i]; });
 
+    // desktop only: when closed, the cover only occupies the book's right
+    // half (left half is the still-reserved-but-invisible left page), which
+    // leaves the closed cover looking off-center in the section. Shifting
+    // the book's own *width* to compensate was tried and reverted - it moves
+    // the cover's rotation pivot along with it, which is also the spine the
+    // stitches are anchored to, so the stitches drifted off the hinge and the
+    // open/close swing looked broken (pivot sliding sideways mid-rotation).
+    // translateX on .pb-book doesn't have that problem - the cover's rotateY
+    // lives on a *child* element with its own fixed-width transform-origin,
+    // so the parent can slide smoothly in parallel with the cover's own
+    // rotation (both keyed off `opened` at the same t=0) with no pivot
+    // conflict; only width ever moved the pivot, not translateX.
+    var isDesktopVariant = root.classList.contains("pb-desktop");
+    // the book's width is now fluid (clamp() in CSS), so the recentering
+    // shift can't be a fixed px constant anymore - it's computed fresh each
+    // render from the book's actual measured width. Cover/coverface are
+    // never measured directly (getBoundingClientRect on a mid-rotation
+    // rotateY element returns a foreshortened rect, not its real width) -
+    // instead this mirrors the same 49.4118% width / 6px offset the CSS
+    // declares for .pb-cover/.pb-coverface, applied to the book's live width.
+    var COVER_WIDTH_RATIO = 336 / 680;
+    var COVER_EDGE_GAP = 6;
+    // mobile: front cover/photos live in the book's right-side slot (the
+    // stage's default clipped window, book-local ~[235,550]) - a small nudge
+    // recenters it. The coverface (back cover) lives in the book's LEFT
+    // slot instead (left:6px width:270, book-local [6,276], center 141,
+    // matching desktop's convention: hinge = coverface's own right edge,
+    // near the true spine) - a completely different part of the book than
+    // the default window shows, so it needs its own, much larger shift to
+    // slide that window over. Both derived from the fixed mobile geometry
+    // (stage 315 center 157.5, book 550 with left:-235):
+    //   front: -235 + S + frontCenter(409) = 157.5  ->  S = -16.5
+    //   back:  -235 + S + backCenter(141)  = 157.5  ->  S = 251.5
+    var MOBILE_COVER_SHIFT = -16.5;
+    var MOBILE_BACK_SHIFT = 251.5;
+    function frontCoverShift(bookWidth){
+      var coverW = bookWidth * COVER_WIDTH_RATIO;
+      var coverCenter = bookWidth - COVER_EDGE_GAP - coverW / 2;
+      return bookWidth / 2 - coverCenter;
+    }
     var els = {
+      book: root.querySelector(".pb-book"),
       left: root.querySelector("[data-pb-left]"),
       leftCover: root.querySelector("[data-pb-left-cover]"),
       leftPhoto: root.querySelector("[data-pb-left-photo]"),
@@ -1320,12 +1384,25 @@ footer a{color:var(--gold)}
 
       var stitchMargin, stitchAngleA, stitchAngleB, stitchStagger;
       if(state.stitchCollapsed){ stitchMargin=-1.5; stitchAngleA=0; stitchAngleB=0; stitchStagger=0; }
-      else if(state.atBack){ stitchMargin=-6; stitchAngleA=-20; stitchAngleB=16; stitchStagger=-0.9; }
-      else if(!state.opened){ stitchMargin=3; stitchAngleA=20; stitchAngleB=-16; stitchStagger=0.9; }
+      // centering the rotation-center exactly on the hinge line (previous
+      // pass) makes the rotated bbox straddle it - half the mark lands on
+      // the cover, half spills onto the page/background past the edge.
+      // rotation preserves the bbox's own center, and the measured rotated
+      // bbox is ~9.7px wide, so shifting the center ~4.85px further inward
+      // (away from the background side) brings the whole mark inside the
+      // cover instead of straddling the edge
+      else if(state.atBack){ stitchMargin=-5.5; stitchAngleA=-20; stitchAngleB=16; stitchStagger=-0.9; }
+      else if(!state.opened){ stitchMargin=2.5; stitchAngleA=20; stitchAngleB=-16; stitchStagger=0.9; }
       else { stitchMargin=-1.5; stitchAngleA=20; stitchAngleB=-20; stitchStagger=0; }
 
       var cordTop = 85;
-      var cordMarginBySide = { loop:-8, front:1, back:-17 };
+      // same straddling issue as the stitches above, but worse since the
+      // cord is 15px wide and unrotated (no bbox ambiguity - this is exact):
+      // centering it on the hinge line put half its 15px on the cover and
+      // half on the background. shifted so the cord's own outer edge (the
+      // side facing the background) sits flush at the hinge instead, so the
+      // whole shape lands inside the cover
+      var cordMarginBySide = { loop:-8, front:-1, back:-14 };
       var cordMargin = cordMarginBySide[state.cordSide];
       var hookScaleX, hookRotate, hookOpacity, strapOpacity, strapScaleX;
       if(state.stitchCollapsed){ hookScaleX=0.1; hookRotate=0; hookOpacity=1; strapOpacity=0; strapScaleX=0.1; }
@@ -1355,7 +1432,17 @@ footer a{color:var(--gold)}
       }
 
       // left / right static pages
-      pbSetHidden(els.left, !state.leftVisible);
+      // at the back cover, the coverface (leftCover) replaces this page
+      // entirely - without hiding it here, the blank page keeps rendering
+      // underneath/beside it, leaving a visible gap. Gated on leftIsCover
+      // (not atBack): atBack flips true at t=0 of the turn, immediately -
+      // stitches sit at z-index:11, *above* the turn leaf's z-index:5, so
+      // hiding this the instant atBack flips made it visibly snap away
+      // mid-flip, while the leaf was still animating on top of it. leftIsCover
+      // only flips true at t=830, exactly when the leaf itself unmounts, so
+      // gating on it hides the old page at the same moment the new coverface
+      // content actually replaces it - no premature snap during the turn.
+      pbSetHidden(els.left, !state.leftVisible || state.leftIsCover);
       if(els.left){
         els.left.style.clipPath = "inset(0 0 0 " + state.leftReveal + "%)";
         els.left.style.transitionDuration = state.revealMs + "ms";
@@ -1396,6 +1483,27 @@ footer a{color:var(--gold)}
         els.cover.style.transitionDuration = state.coverMs + "ms";
         els.cover.style.pointerEvents = state.opened ? "none" : "auto";
       }
+      // slides in/out in parallel with the cover's own rotation (front) or
+      // the closeToBack/openFromBack turn (back) - both key off the same
+      // state flag the rotation/turn itself keys off, at the same t=0, so
+      // they ease together instead of one snapping after the other finishes
+      if(isDesktopVariant && els.book){
+        var bookShift = 0;
+        if(!state.opened || state.atBack){
+          var frontShift = frontCoverShift(els.book.getBoundingClientRect().width);
+          bookShift = !state.opened ? frontShift : -frontShift;
+        }
+        els.book.style.transform = bookShift ? "translateX(" + bookShift + "px)" : "";
+      } else if(els.book){
+        // gated on atBack (t=0, same as the flip itself) to match desktop's
+        // bookShift above, which slides in parallel with its own turn for
+        // the same reason. previously gated on leftIsCover (t=830, after
+        // the flip finishes) to dodge the leaf sliding mid-flip - but
+        // desktop slides a comparable magnitude concurrently without issue,
+        // so the flip+slide-together look is worth matching here too.
+        var mobileShift = !state.opened ? MOBILE_COVER_SHIFT : (state.atBack ? MOBILE_BACK_SHIFT : 0);
+        els.book.style.transform = mobileShift ? "translateX(" + mobileShift + "px)" : "";
+      }
 
       if(els.openHint) els.openHint.textContent = pbT("gal.openHint", "tap to open");
 
@@ -1415,6 +1523,10 @@ footer a{color:var(--gold)}
     if(els.cover) els.cover.addEventListener("click", goNext);
     if(els.left) els.left.addEventListener("click", goPrev);
     if(els.right) els.right.addEventListener("click", goNext);
+    // the coverface (back cover) moved out of .pb-page-left (to escape its
+    // reveal-sweep clip-path) so it no longer inherits that element's click
+    // handler - needs its own, same goPrev turn-left behavior
+    if(els.leftCover) els.leftCover.addEventListener("click", goPrev);
 
     render();
     pbRerenders.push(render);
