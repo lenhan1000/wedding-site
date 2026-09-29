@@ -444,6 +444,7 @@ section{padding-block:clamp(3rem,6.5vw,5rem);position:relative}
 .band-marigold .flip-face.back .display,.band-marigold .flip-face.back h3{color:var(--lacquer)}
 .flip-hint{position:absolute;bottom:.55rem;right:.55rem;z-index:3;font-size:.56rem;letter-spacing:.08em;text-transform:uppercase;
   color:var(--ink-soft);background:rgba(255,255,255,.88);padding:.2rem .55rem;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.flip-hint-inline{margin:.6rem 0 0;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft)}
 .postcard .photo{aspect-ratio:4/3;position:relative;overflow:hidden;border-radius:2px 4px 3px 5px;
   background:repeating-linear-gradient(45deg,rgba(198,140,46,.12) 0 12px,transparent 12px 24px),var(--cream)}
 .postcard .slot{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--gold);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;padding:1.2rem}
@@ -958,7 +959,7 @@ footer a{color:var(--ivory);text-decoration:underline}
         <span class="strip" data-i18n-html="sgn.venue.strip">&#9670; Chloe Gallery &#9670; District 7 &middot; S&#224;i G&#242;n &#9670;</span>
       </div>
       <div class="postcard flip rv">
-        <input type="checkbox" id="pc-flip" class="flip-check">
+        <input type="checkbox" id="pc-flip" class="flip-check" checked>
         <label for="pc-flip" class="flip-card">
           <div class="flip-inner">
             <div class="flip-face front">
@@ -979,6 +980,7 @@ footer a{color:var(--ivory);text-decoration:underline}
                   <div><dt data-i18n="venue.getL">Getting there</dt><dd data-i18n="venue.getD">~10 minutes from Crescent Mall.</dd></div>
                   <div><dt data-i18n="venue.parkL">Parking</dt><dd data-i18n="venue.parkD">Free car and motorbike parking on site.</dd></div>
                 </dl>
+                <p class="flip-hint-inline" data-i18n="sgn.venue.flip">&#8635; Tap to flip</p>
               </div>
               <div class="map-slot"><iframe src="https://maps.google.com/maps?q=Chloe+Gallery+Phan+Van+Chuong+District+7&amp;output=embed" width="100%" height="100%" style="border:0" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Chloe Gallery map"></iframe></div>
             </div>
