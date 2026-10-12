@@ -96,7 +96,8 @@ function doPost(e) {
     else sh.appendRow(row);
 
     var emailSent = true;
-    try { sendConfirmation_(row, ceremony, data.lang === "vi" ? "vi" : "en"); } catch (mailErr) { emailSent = false; }
+    try { sendConfirmation_(row, ceremony, data.lang === "vi" ? "vi" : "en"); }
+    catch (mailErr) { emailSent = false; console.error("Confirmation email failed: " + mailErr); }  // see Executions in the editor
     return json_({ ok: true, emailSent: emailSent, updated: !!existing });
   } catch (err) {
     return json_({ ok: false, error: "server_error" });
@@ -131,4 +132,11 @@ function sendConfirmation_(row, ceremony, lang) {
   }
   lines.push("", t.edit, link);
   MailApp.sendEmail({ to: email, subject: t.subject, body: lines.join("\n") });
+}
+
+// Run this ONCE from the editor (select it in the function dropdown, click Run) to grant the
+// "send email as you" permission. Deploying a new version never asks for it, so without this
+// every confirmation email fails and the form says "couldn't send the confirmation email".
+function authorizeMail() {
+  MailApp.sendEmail(Session.getActiveUser().getEmail(), "RSVP mail test", "Mail permission works.");
 }
