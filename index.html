@@ -683,8 +683,16 @@ section{padding-block:clamp(3rem,6.5vw,5rem);position:relative}
 .rsvp-card fieldset{border:0;margin:0;padding:0;min-width:0}
 .rsvp-note{font-size:.78rem;color:var(--ink-soft);margin-top:.8rem}
 .rsvp-done{display:none;text-align:center;padding:1.4rem 0;position:relative;z-index:2}
+/* the card sits in a palm band whose .muted rule is ivory-on-dark; the envelope is ivory, so keep ink */
+.rsvp-card .rsvp-done p{color:var(--ink-soft)}
 .rsvp-done h3{font-family:"Hong Ky",serif;color:var(--lacquer);font-size:1.7rem;text-transform:uppercase;margin-bottom:.4rem}
-form.sent .rsvp-body{display:none} form.sent .rsvp-done{display:block}
+form.sent .rsvp-body{display:none} form.sent .rsvp-done{display:flex;flex-direction:column;justify-content:center;align-items:center}
+/* on wide screens keep a real air-mail envelope shape (about 1.6:1) with the message under the flap point,
+   instead of a flat strip with the text pinned to the top */
+@media (min-width:720px){
+  form.sent .rsvp-done{min-height:17rem;padding-top:3rem}   /* keeps the card ~1.6:1 at its full 640px width */
+  form.sent::before{height:185px}                           /* flap seams scale with the card instead of flattening out */
+}
 
 /* footer */
 footer{position:relative;background:var(--palm);color:var(--ivory);text-align:center;padding:clamp(3rem,7vw,5rem) 1.2rem}
@@ -1377,40 +1385,40 @@ footer a{color:var(--ivory);text-decoration:underline}
   // shrinking it broke this shared turn-leaf math) and is simply clipped
   // off-screen by its ancestor .pb-stage, peeking a ~40px sliver at the edge.
   var PB_PHOTOS = [
-    { src: "assets/photobook/01.jpg", tilt: -2, p: 1 },
-    { src: "assets/photobook/02.jpg", tilt: 1.5, p: 1 },
-    { src: "assets/photobook/03.jpg", tilt: -1, p: 1 },
-    { src: "assets/photobook/04.jpg", tilt: 2, p: 1 },
-    { src: "assets/photobook/05.jpg", tilt: -1.5, p: 1 },
-    { src: "assets/photobook/06.jpg", tilt: 1, p: 1 },
-    { src: "assets/photobook/07.jpg", tilt: -2 },
-    { src: "assets/photobook/08.jpg", tilt: 1.5 },
-    { src: "assets/photobook/09.jpg", tilt: -1, p: 1 },
-    { src: "assets/photobook/10.jpg", tilt: 2 },
-    { src: "assets/photobook/11.jpg", tilt: -1.5 },
-    { src: "assets/photobook/12.jpg", tilt: 1 },
     { src: "assets/photobook/13.jpg", tilt: -2, p: 1 },
-    { src: "assets/photobook/14.jpg", tilt: 1.5, p: 1 },
-    { src: "assets/photobook/15.jpg", tilt: -1 },
-    { src: "assets/photobook/16.jpg", tilt: 2 },
-    { src: "assets/photobook/17.jpg", tilt: -1.5, p: 1 },
-    { src: "assets/photobook/18.jpg", tilt: 1, p: 1 },
-    { src: "assets/photobook/19.jpg", tilt: -2, p: 1 },
-    { src: "assets/photobook/20.jpg", tilt: 1.5, p: 1 },
-    { src: "assets/photobook/21.jpg", tilt: -1, p: 1 },
-    { src: "assets/photobook/22.jpg", tilt: 2 },
-    { src: "assets/photobook/23.jpg", tilt: -1.5, p: 1 },
-    { src: "assets/photobook/24.jpg", tilt: 1, p: 1 },
-    { src: "assets/photobook/25.jpg", tilt: -2, p: 1 },
-    { src: "assets/photobook/26.jpg", tilt: 1.5, p: 1 },
-    { src: "assets/photobook/27.jpg", tilt: -1 },
-    { src: "assets/photobook/28.jpg", tilt: 2 },
-    { src: "assets/photobook/29.jpg", tilt: -1.5 },
-    { src: "assets/photobook/30.jpg", tilt: 1, p: 1 },
-    { src: "assets/photobook/31.jpg", tilt: -2, p: 1 },
-    { src: "assets/photobook/32.jpg", tilt: 1.5 },
+    { src: "assets/photobook/29.jpg", tilt: 1.5 },
     { src: "assets/photobook/33.jpg", tilt: -1, p: 1 },
-    { src: "assets/photobook/34.jpg", tilt: 2 }
+    { src: "assets/photobook/25.jpg", tilt: 2, p: 1 },
+    { src: "assets/photobook/34.jpg", tilt: -1.5 },
+    { src: "assets/photobook/19.jpg", tilt: 1, p: 1 },
+    { src: "assets/photobook/28.jpg", tilt: -2 },
+    { src: "assets/photobook/06.jpg", tilt: 1.5, p: 1 },
+    { src: "assets/photobook/07.jpg", tilt: -1 },
+    { src: "assets/photobook/05.jpg", tilt: 2, p: 1 },
+    { src: "assets/photobook/20.jpg", tilt: -1.5, p: 1 },
+    { src: "assets/photobook/11.jpg", tilt: 1 },
+    { src: "assets/photobook/18.jpg", tilt: -2, p: 1 },
+    { src: "assets/photobook/17.jpg", tilt: 1.5, p: 1 },
+    { src: "assets/photobook/16.jpg", tilt: -1 },
+    { src: "assets/photobook/14.jpg", tilt: 2, p: 1 },
+    { src: "assets/photobook/23.jpg", tilt: -1.5, p: 1 },
+    { src: "assets/photobook/22.jpg", tilt: 1 },
+    { src: "assets/photobook/24.jpg", tilt: -2, p: 1 },
+    { src: "assets/photobook/26.jpg", tilt: 1.5, p: 1 },
+    { src: "assets/photobook/12.jpg", tilt: -1 },
+    { src: "assets/photobook/09.jpg", tilt: 2, p: 1 },
+    { src: "assets/photobook/04.jpg", tilt: -1.5, p: 1 },
+    { src: "assets/photobook/15.jpg", tilt: 1 },
+    { src: "assets/photobook/03.jpg", tilt: -2, p: 1 },
+    { src: "assets/photobook/08.jpg", tilt: 1.5 },
+    { src: "assets/photobook/30.jpg", tilt: -1, p: 1 },
+    { src: "assets/photobook/10.jpg", tilt: 2 },
+    { src: "assets/photobook/31.jpg", tilt: -1.5, p: 1 },
+    { src: "assets/photobook/27.jpg", tilt: 1 },
+    { src: "assets/photobook/02.jpg", tilt: -2, p: 1 },
+    { src: "assets/photobook/32.jpg", tilt: 1.5 },
+    { src: "assets/photobook/01.jpg", tilt: -1, p: 1 },
+    { src: "assets/photobook/21.jpg", tilt: 2, p: 1 }
   ];
   function pbT(key, fallback){
     var d = (typeof I18N !== "undefined" && I18N[lang]) ? I18N[lang] : {};
@@ -1749,7 +1757,7 @@ footer a{color:var(--ivory);text-decoration:underline}
 
   // mobile photobook is laid out in fixed px (315px stage); scale the whole stage to the
   // screen so it fills the width instead of sitting at a fixed small size. The turn/stitch
-  // math is all in stage-local px (never measured on mobile), so a uniform zoom is safe.
+  // math is all in stage-local px (never measured on mobile), so a uniform scale is safe.
   // venue postcard (mobile): size the flipped card to its real content height, animated by
   // the .flip-inner min-height transition. Measured by briefly putting the back face in-flow.
   var pcChk = document.getElementById("pc-flip");
@@ -1774,7 +1782,10 @@ footer a{color:var(--ivory);text-decoration:underline}
   if(pbStage){
     var fitPb = function(){
       var z = Math.max(.9, Math.min(1.5, (document.documentElement.clientWidth - 32) / 315));
-      pbStage.style.zoom = z.toFixed(3);
+      // transform, not CSS zoom: iOS Safari mis-renders the cover flower's rounded petals under zoom
+      pbStage.style.transformOrigin = "50% 0";
+      pbStage.style.transform = z === 1 ? "" : "scale(" + z.toFixed(3) + ")";
+      pbStage.style.marginBottom = ((z - 1) * 295).toFixed(1) + "px";   // keep layout flow in step with the scaled size
     };
     fitPb(); window.addEventListener("resize", fitPb);
   }
