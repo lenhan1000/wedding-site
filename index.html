@@ -436,8 +436,12 @@ section{padding-block:clamp(3rem,6.5vw,5rem);position:relative}
 @media (max-width:640px){
   .flip-face.back{grid-template-columns:1fr}
   /* stacked info-then-map needs much more height than the 2-column desktop layout —
-     grow the card to fit it fully rather than leaving it to scroll inside the card */
+     grow the card to fit it fully rather than leaving it to scroll inside the card.
+     The 640px is only a fallback: fitFlip() in the script measures the real back-face
+     height (info rows, longer VI strings) and sets it inline, so the existing min-height
+     transition still animates the growth instead of the card snapping. */
   .flip-check:checked + .flip-card .flip-inner{min-height:640px}
+  .flip-check:checked + .flip-card .flip-face.back .map-slot{aspect-ratio:1/1;height:auto;min-height:0}
 }
 .flip-face.back .back-info{display:flex;flex-direction:column;gap:1rem;min-width:0}
 .flip-face.back .info-list{margin-top:0}
@@ -1168,6 +1172,7 @@ footer a{color:var(--ivory);text-decoration:underline}
     document.querySelectorAll(".lang button").forEach(function(b){ b.setAttribute("aria-pressed", String(b.getAttribute("data-lang")===l)); });
     try{ localStorage.setItem("wed_lang", l); }catch(e){}
     fitVenuePlank();
+    if(typeof fitFlip === "function") fitFlip();
     pbRerenders.forEach(function(fn){ fn(); });
   }
   document.querySelectorAll(".lang button").forEach(function(b){ b.addEventListener("click", function(){ applyLang(b.getAttribute("data-lang")); }); });
@@ -1693,6 +1698,38 @@ footer a{color:var(--ivory);text-decoration:underline}
   document.querySelectorAll("[data-pb]").forEach(function(root){
     createPhotobook(root, { pair: root.getAttribute("data-pb-pair") === "1" });
   });
+
+  // mobile photobook is laid out in fixed px (315px stage); scale the whole stage to the
+  // screen so it fills the width instead of sitting at a fixed small size. The turn/stitch
+  // math is all in stage-local px (never measured on mobile), so a uniform zoom is safe.
+  // venue postcard (mobile): size the flipped card to its real content height, animated by
+  // the .flip-inner min-height transition. Measured by briefly putting the back face in-flow.
+  var pcChk = document.getElementById("pc-flip");
+  window.fitFlip = function(){
+    if(!pcChk) return;
+    var inner = document.querySelector(".flip-inner"), back = document.querySelector(".flip-face.back");
+    if(!inner || !back) return;
+    if(!pcChk.checked || !window.matchMedia("(max-width:640px)").matches){ inner.style.minHeight = ""; return; }
+    back.style.position = "relative"; back.style.inset = "auto";
+    var h = back.offsetHeight;
+    back.style.position = ""; back.style.inset = "";
+    inner.style.minHeight = h + "px";
+  };
+  if(pcChk){
+    pcChk.addEventListener("change", fitFlip);
+    window.addEventListener("resize", fitFlip);
+    window.addEventListener("load", fitFlip);
+    fitFlip();
+  }
+
+  var pbStage = document.querySelector(".pb-mobile .pb-stage");
+  if(pbStage){
+    var fitPb = function(){
+      var z = Math.max(.9, Math.min(1.5, (document.documentElement.clientWidth - 32) / 315));
+      pbStage.style.zoom = z.toFixed(3);
+    };
+    fitPb(); window.addEventListener("resize", fitPb);
+  }
 
 })();
 </script>
