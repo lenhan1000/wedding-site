@@ -106,32 +106,14 @@ function doPost(e) {
   }
 }
 
+// Builds the air-mail envelope email (Email.gs) and sends it with a plain-text fallback.
 function sendConfirmation_(row, ceremony, lang) {
-  var email = row[0], code = row[2], attending = row[5] === "Yes";
-  var names = [row[6]].concat(row[7] ? String(row[7]).split("\n") : []).join(", ");
-  var link = SITE_URL + "?" + (code ? "c=" + encodeURIComponent(code) + "&" : "") + "e=" + encodeURIComponent(email) + "#rsvp";
-  var t = lang === "vi" ? {
-    subject: "Xác nhận RSVP - Nhân & Ngân, 12/12/2026",
-    yes: "Cảm ơn bạn! Chúng mình rất mong được gặp: ",
-    no: "Cảm ơn bạn đã báo cho chúng mình. Rất tiếc không thể gặp: ",
-    cer: "Lễ trao lời thề: đón khách 15:00, lễ lúc 16:00, chụp ảnh khoảng 16:40.",
-    eve: "Buổi tối: đón khách 18:00, nghi thức 19:00, tiệc tối 19:30.",
-    edit: "Cần thay đổi? Dùng lại đường dẫn này đến hết ngày 15/11/2026:"
-  } : {
-    subject: "Your RSVP - Zack & Louise, 12 December 2026",
-    yes: "Thank you! We can't wait to celebrate with ",
-    no: "Thank you for letting us know. We'll miss ",
-    cer: "Vow ceremony: welcome from 15:00, vows at 16:00, photos around 16:40.",
-    eve: "Evening: welcome 18:00, ceremony 19:00, dinner 19:30.",
-    edit: "Need to change something? Use this same link until 15 November 2026:"
-  };
-  var lines = [(attending ? t.yes : t.no) + names + "."];
-  if (attending) {
-    if (ceremony) lines.push("", t.cer);
-    lines.push("", t.eve);
-  }
-  lines.push("", t.edit, link);
-  MailApp.sendEmail({ to: email, subject: t.subject, body: lines.join("\n") });
+  var email = row[0], code = row[2];
+  var names = [row[6]].concat(row[7] ? String(row[7]).split("\n") : []);
+  var editUrl = SITE_URL + "?" + (code ? "c=" + encodeURIComponent(code) + "&" : "") + "e=" + encodeURIComponent(email) + "#rsvp";
+  var m = buildEmail_({ lang: lang, attending: row[5] === "Yes", names: names, ceremony: ceremony, editUrl: editUrl });
+  MailApp.sendEmail({ to: email, subject: m.subject, body: m.text, htmlBody: m.html,
+                      name: lang === "vi" ? "Nhân & Ngân" : "Zack & Louise" });
 }
 
 // Run this ONCE from the editor (select it in the function dropdown, click Run) to grant the
