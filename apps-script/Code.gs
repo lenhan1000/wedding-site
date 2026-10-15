@@ -2,22 +2,24 @@
  * RSVP backend for the wedding site. Bound to the spreadsheet (Extensions > Apps Script).
  *
  * The page (index.html) owns the invitation tiers: it maps the ?c= code to plus-one
- * allowance and ceremony access, and posts the result. This script trusts what the page
- * sends (we trust our guests), but caps plus-one names at MAX_PLUS and enforces the deadline.
+ * allowance (always 0 or 1) and ceremony access, and posts the result. This script trusts
+ * the tier the page sends (we trust our guests), but requires the answers that tier asks for
+ * and enforces the deadline.
  *
  * Sheet: "RSVPs" is created automatically on the first submission, one row per email
- * (resubmitting with the same email edits that row):
- *   Email | Updated | Code | Tier | Ceremony | Attending | Name | Plus-ones | Note
- * If an old "RSVPs" tab from the earlier form exists, clear it (or delete it) first.
+ * (resubmitting with the same email edits that row). The header row is rewritten to match
+ * RSVP_HEADERS on every call, so new columns only ever get added to the right:
+ *   Email | Updated | Code | Tier | Ceremony | Attending | Name | Plus-one name | Note |
+ *   Joining | Plus-one | Plus-one joining | Ceremony headcount | Evening headcount
+ * Old rows keep working; their new columns are just blank.
  *
  * Deploy: Deploy > Manage deployments > edit > New version (Execute as: Me, Access: Anyone).
  */
 
 var DEADLINE = new Date("2026-11-15T23:59:59+07:00"); // end of 15 Nov, Saigon time
 var SITE_URL = "https://lenhan1000.github.io/wedding-site/"; // used in the confirmation email edit link (keep the trailing slash)
-var MAX_PLUS = 4;
-
-var RSVP_HEADERS = ["Email", "Updated", "Code", "Tier", "Ceremony", "Attending", "Name", "Plus-ones", "Note"];
+var RSVP_HEADERS = ["Email", "Updated", "Code", "Tier", "Ceremony", "Attending", "Name", "Plus-one name", "Note",
+                    "Joining", "Plus-one", "Plus-one joining", "Ceremony headcount", "Evening headcount"];
 
 function json_(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
@@ -26,7 +28,7 @@ function json_(obj) {
 function rsvpSheet_() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sh = ss.getSheetByName("RSVPs") || ss.insertSheet("RSVPs");
-  if (sh.getLastRow() === 0) sh.appendRow(RSVP_HEADERS);
+  sh.getRange(1, 1, 1, RSVP_HEADERS.length).setValues([RSVP_HEADERS]);
   return sh;
 }
 
@@ -52,8 +54,8 @@ function doGet(e) {
     if (existing) {
       var v = existing.values;
       resp = {
-        email: v[0], attending: v[5], name: v[6],
-        plus: String(v[7]) ? String(v[7]).split("\n") : [], note: v[8]
+        email: v[0], attending: v[5], name: v[6], plus: String(v[7] || ""), note: v[8],
+        joining: v[9], bringing: v[10], plusJoining: v[11]
       };
     }
     return json_({ ok: true, closed: new Date() > DEADLINE, response: resp });
@@ -64,7 +66,7 @@ function doGet(e) {
 
 function clean_(s, max) { return String(s == null ? "" : s).replace(/[\r\u0000]/g, "").trim().slice(0, max); }
 
-// POST text/plain JSON {code, tier, ceremony, attending, guest1, plus1.., email, note, lang}
+// POST text/plain JSON {code, tier, ceremony, plus, attending, joining, bringing, guest1, plus1, plusJoining, email, note, lang}
 function doPost(e) {
   var lock = LockService.getScriptLock();
   try {
@@ -78,25 +80,38 @@ function doPost(e) {
     var name = clean_(data.guest1, 200);
     if (!name) return json_({ ok: false, error: "bad_name" });
 
-    var attending = data.attending === "no" ? "No" : "Yes";
-    var ceremony = data.ceremony === true || data.ceremony === "true";
-    var plus = [];
+    if (data.attending !== "yes" && data.attending !== "no") return json_({ ok: false, error: "bad_attending" });
+    var attending = data.attending === "yes" ? "Yes" : "No";
+    var ceremonyTier = data.ceremony === true || data.ceremony === "true";
+    var plusAllowed = Number(data.plus) >= 1;
+
+    // what a guest answered only counts when their tier asked the question; a "No" clears everything
+    var joining = "", bringing = "", plusName = "", plusJoining = "";
     if (attending === "Yes") {
-      for (var i = 1; i <= MAX_PLUS; i++) {
-        var p = clean_(data["plus" + i], 200);
-        if (p) plus.push(p);
+      joining = ceremonyTier ? data.joining : "evening";
+      if (joining !== "ceremony" && joining !== "evening") return json_({ ok: false, error: "bad_joining" });
+      if (plusAllowed) {
+        if (data.bringing !== "yes" && data.bringing !== "no") return json_({ ok: false, error: "bad_bringing" });
+        bringing = data.bringing === "yes" ? "Yes" : "No";
+        if (bringing === "Yes") {
+          plusName = clean_(data.plus1, 200);
+          plusJoining = joining === "ceremony" && data.plusJoining === "ceremony" ? "ceremony" : "evening";
+        }
       }
     }
+    var ceremonyCount = (joining === "ceremony" ? 1 : 0) + (plusJoining === "ceremony" ? 1 : 0);
+    var eveningCount = attending === "Yes" ? 1 + (bringing === "Yes" ? 1 : 0) : 0;
 
     var sh = rsvpSheet_();
-    var row = [email, new Date(), clean_(data.code, 40), clean_(data.tier, 40) || "Guest", ceremony ? "Yes" : "No",
-               attending, name, plus.join("\n"), clean_(data.note, 2000)];
+    var row = [email, new Date(), clean_(data.code, 40), clean_(data.tier, 40) || "Guest", ceremonyTier ? "Yes" : "No",
+               attending, name, plusName, clean_(data.note, 2000),
+               joining, bringing, plusJoining, ceremonyCount, eveningCount];
     var existing = findRsvp_(sh, email);
     if (existing) sh.getRange(existing.rowIndex, 1, 1, row.length).setValues([row]);
     else sh.appendRow(row);
 
     var emailSent = true;
-    try { sendConfirmation_(row, ceremony, data.lang === "vi" ? "vi" : "en"); }
+    try { sendConfirmation_(row, data.lang === "vi" ? "vi" : "en"); }
     catch (mailErr) { emailSent = false; console.error("Confirmation email failed: " + mailErr); }  // see Executions in the editor
     return json_({ ok: true, emailSent: emailSent, updated: !!existing });
   } catch (err) {
@@ -107,11 +122,16 @@ function doPost(e) {
 }
 
 // Builds the air-mail envelope email (Email.gs) and sends it with a plain-text fallback.
-function sendConfirmation_(row, ceremony, lang) {
+function sendConfirmation_(row, lang) {
   var email = row[0], code = row[2];
-  var names = [row[6]].concat(row[7] ? String(row[7]).split("\n") : []);
+  var names = [row[6]].concat(row[7] ? [row[7]] : []);
   var editUrl = SITE_URL + "?" + (code ? "c=" + encodeURIComponent(code) + "&" : "") + "e=" + encodeURIComponent(email) + "#rsvp";
-  var m = buildEmail_({ lang: lang, attending: row[5] === "Yes", names: names, ceremony: ceremony, editUrl: editUrl });
+  var m = buildEmail_({
+    lang: lang, attending: row[5] === "Yes", names: names, editUrl: editUrl,
+    ceremony: row[9] === "ceremony",                 // this guest sees the afternoon programme
+    invited: row[4] === "Yes",                       // their code includes the ceremony, so say which parts they chose
+    bringing: row[10] === "Yes", plusName: row[7], plusJoining: row[11]
+  });
   MailApp.sendEmail({ to: email, subject: m.subject, body: m.text, htmlBody: m.html,
                       name: lang === "vi" ? "Nhân & Ngân" : "Zack & Louise" });
 }

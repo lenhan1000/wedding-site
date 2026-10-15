@@ -7,7 +7,9 @@
  * border, stamp and postmark are built from coloured table cells and CSS borders. Clients that
  * ignore border-radius just show a square postmark. A plain-text version is built alongside.
  *
- * buildEmail_({lang, attending, names:[...], ceremony, editUrl, siteUrl}) -> {subject, html, text}
+ * buildEmail_({lang, attending, names:[...], ceremony, invited, bringing, plusName, plusJoining, editUrl}) -> {subject, html, text}
+ *   ceremony = this guest joins the afternoon ceremony; invited = their code includes it (so the parts they chose are echoed back);
+ *   bringing/plusName/plusJoining describe the plus-one ("ceremony" or "evening").
  */
 
 var EMAIL_C = { lacquer: "#B5482E", palm: "#2C4E2A", gold: "#B8912F", ivory: "#F5EDDD", paper: "#FCF7EA",
@@ -24,6 +26,8 @@ var EMAIL_COPY = {
     yesSub: "We can’t wait to celebrate with you.", noSub: "Thank you for letting us know. We’ll be thinking of you.",
     toLabel: "To", received: "RSVP received",
     date: "Saturday, 12 December 2026",
+    joiningLabel: "Joining", plusLabel: "Plus-one", plusTbc: "name to come",
+    joinBoth: "Ceremony & evening", joinEve: "Evening only",
     progMast: "Radio Z&L", progSub: "Today’s programme", onAir: "On air",
     partAfternoon: "Afternoon · Vow ceremony", partEvening: "Evening · Celebration",
     rows: {
@@ -49,6 +53,8 @@ var EMAIL_COPY = {
     yesSub: "Chúng mình rất mong được chung vui cùng bạn.", noSub: "Cảm ơn bạn đã báo cho chúng mình. Chúng mình sẽ nhớ bạn.",
     toLabel: "Gửi", received: "Đã nhận phản hồi",
     date: "Thứ Bảy, 12 tháng 12, 2026",
+    joiningLabel: "Tham dự", plusLabel: "Người đi cùng", plusTbc: "sẽ báo tên sau",
+    joinBoth: "Lễ & tiệc tối", joinEve: "Chỉ tiệc tối",
     progMast: "Đài N&N", progSub: "Chương trình hôm nay", onAir: "Đang phát",
     partAfternoon: "Buổi chiều · Lễ trao lời thề", partEvening: "Buổi tối · Tiệc mừng",
     rows: {
@@ -155,6 +161,16 @@ function buildEmail_(o) {
       '</td></tr>';
   }
 
+  // what they chose, echoed back so they can spot a mistake: parts (ceremony codes only) and the plus-one
+  var details = [];
+  if (attending && o.invited) details.push(c.joiningLabel + ": " + (ceremony ? c.joinBoth : c.joinEve));
+  if (attending && o.bringing) {
+    details.push(c.plusLabel + ": " + (o.plusName || c.plusTbc) + (o.invited ? " · " + (o.plusJoining === "ceremony" ? c.joinBoth : c.joinEve) : ""));
+  }
+  var detailHtml = details.map(function (d) {
+    return '<div style="font-family:' + sans + ';font-size:14px;line-height:21px;color:' + C.ink + ';padding-top:4px;">' + emailEsc_(d) + '</div>';
+  }).join("");
+
   var toLine = names.length ? emailEsc_(names.join(", ")) : "";
   var html =
     '<!DOCTYPE html><html lang="' + lang + '"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
@@ -183,6 +199,7 @@ function buildEmail_(o) {
             (toLine ? '<tr><td colspan="2" style="padding:22px 0 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="border-top:1px solid ' + C.hair + ';border-bottom:1px solid ' + C.hair + ';padding:12px 0;font-family:' + serif + ';font-size:18px;color:' + C.ink + ';"><span style="font-family:' + sans + ';font-size:11px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;color:' + C.soft + ';">' + emailEsc_(c.toLabel) + '&nbsp;&nbsp;</span><i>' + toLine + '</i></td></tr></table></td></tr>' : '') +
             // date
             (attending ? '<tr><td colspan="2" align="center" style="padding:18px 0 0;font-family:' + sans + ';font-size:12px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;color:' + C.palm + ';">' + emailEsc_(c.date) + '</td></tr>' : '') +
+            (detailHtml ? '<tr><td colspan="2" align="center" style="padding:8px 0 0;">' + detailHtml + '</td></tr>' : '') +
             programme +
             // edit
             '<tr><td colspan="2" align="center" style="padding:30px 0 0;">' +
@@ -203,6 +220,7 @@ function buildEmail_(o) {
   t.push(attending ? c.yesSub : c.noSub);
   if (attending) {
     t.push("", c.date);
+    details.forEach(function (d) { t.push(d); });
     var keys = (ceremony ? ["v1", "v2", "v3"] : []).concat(["e1", "e2", "e3", "e4"]);
     keys.forEach(function (k) { t.push(c.rows[k][0] + "  " + c.rows[k][1] + " - " + c.rows[k][2]); });
     t.push("", c.venueName, EMAIL_ADDRESS, c.venueNote, EMAIL_MAP_URL);

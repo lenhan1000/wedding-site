@@ -686,6 +686,8 @@ section{padding-block:clamp(3rem,6.5vw,5rem);position:relative}
 .choice label{display:flex;align-items:center;justify-content:center;gap:.5rem;flex:1 1 160px;border:1.5px solid var(--hair);border-radius:2px;padding:.55rem .9rem;cursor:pointer;font-size:.9rem;background:#FCF7EA}
 .choice input{accent-color:var(--lacquer)}
 .plus-list{display:grid;gap:.6rem}
+.field-err{margin:0;font-size:.82rem;color:var(--lacquer);font-weight:600}
+.field-hint{margin:0;font-size:.8rem;color:var(--ink-soft)}
 .rsvp-actions{margin-top:1.7rem}
 .rsvp-actions .btn{background:var(--palm);border-color:var(--palm)}
 .rsvp-actions .btn:hover{background:#1e3a1c}
@@ -1095,21 +1097,48 @@ footer a{color:var(--ivory);text-decoration:underline}
           <div class="field">
             <label data-i18n="rsvp.attendL">Will you attend?</label>
             <div class="choice">
-              <label><input type="radio" name="attending" value="yes" checked> <span data-i18n="rsvp.yes">Joyfully accepts</span></label>
+              <label><input type="radio" name="attending" value="yes"> <span data-i18n="rsvp.yes">Joyfully accepts</span></label>
               <label><input type="radio" name="attending" value="no"> <span data-i18n="rsvp.no">Regretfully declines</span></label>
             </div>
+            <p class="field-err" data-err="attending" role="alert" hidden></p>
           </div>
           <div class="field" id="primaryNames">
             <label data-i18n="rsvp.nameL">Your name</label>
-            <input type="text" name="guest1" required autocomplete="name" data-i18n-ph="rsvp.namePh" placeholder="Full name">
+            <input type="text" name="guest1" autocomplete="name" data-i18n-ph="rsvp.namePh" placeholder="Full name">
+            <p class="field-err" data-err="name" role="alert" hidden></p>
+          </div>
+          <div class="field" id="partsWrap" hidden>
+            <label data-i18n="rsvp.partsL">Which parts will you join?</label>
+            <div class="choice">
+              <label><input type="radio" name="joining" value="ceremony"> <span data-i18n="rsvp.partsBoth">Ceremony &amp; evening · from 15:00</span></label>
+              <label><input type="radio" name="joining" value="evening"> <span data-i18n="rsvp.partsEve">Evening only · from 18:00</span></label>
+            </div>
+            <p class="field-err" data-err="joining" role="alert" hidden></p>
+          </div>
+          <div class="field" id="bringWrap" hidden>
+            <label data-i18n="rsvp.bringL">Are you bringing a plus-one?</label>
+            <div class="choice">
+              <label><input type="radio" name="bringing" value="yes"> <span data-i18n="rsvp.bringYes">Yes, I'm bringing someone</span></label>
+              <label><input type="radio" name="bringing" value="no"> <span data-i18n="rsvp.bringNo">No, just me</span></label>
+            </div>
+            <p class="field-err" data-err="bringing" role="alert" hidden></p>
           </div>
           <div class="field" id="plusWrap" hidden>
-            <label data-i18n="rsvp.plusL">Your guest(s)</label>
-            <div class="plus-list" id="plusList"></div>
+            <label data-i18n="rsvp.plusNameL">Your guest's name (optional)</label>
+            <input type="text" name="plus1" autocomplete="off" data-i18n-ph="rsvp.namePh" placeholder="Full name">
+            <p class="field-hint" data-i18n="rsvp.plusHint">No need to know yet. You can edit your reply any time before 15 November.</p>
+          </div>
+          <div class="field" id="plusPartsWrap" hidden>
+            <label data-i18n="rsvp.plusJoinL">Your guest will join</label>
+            <div class="choice">
+              <label><input type="radio" name="plusJoining" value="same" checked> <span data-i18n="rsvp.plusSame">Same as me</span></label>
+              <label><input type="radio" name="plusJoining" value="evening"> <span data-i18n="rsvp.plusEve">Evening only</span></label>
+            </div>
           </div>
           <div class="field">
             <label data-i18n="rsvp.emailL">Email (for your confirmation)</label>
-            <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+            <input type="email" name="email" autocomplete="email" placeholder="you@example.com">
+            <p class="field-err" data-err="email" role="alert" hidden></p>
           </div>
           <div class="field">
             <label data-i18n="rsvp.noteL">A note for us (optional)</label>
@@ -1181,6 +1210,11 @@ footer a{color:var(--ivory);text-decoration:underline}
     "rsvp.loadFail": "Couldn't load your invitation. Please refresh or contact us.",
     "rsvp.sendFail": "Couldn't send your RSVP. Please try again or email us.",
     "rsvp.badEmail": "Please enter a valid email address.",
+    "rsvp.partsL": "Which parts will you join?", "rsvp.partsBoth": "Ceremony & evening · from 15:00", "rsvp.partsEve": "Evening only · from 18:00",
+    "rsvp.bringL": "Are you bringing a plus-one?", "rsvp.bringYes": "Yes, I'm bringing someone", "rsvp.bringNo": "No, just me",
+    "rsvp.plusNameL": "Your guest's name (optional)", "rsvp.plusHint": "No need to know yet. You can edit your reply any time before 15 November.",
+    "rsvp.plusJoinL": "Your guest will join", "rsvp.plusSame": "Same as me", "rsvp.plusEve": "Evening only",
+    "rsvp.errAttend": "Please let us know if you can come.", "rsvp.errParts": "Please choose which parts you'll join.", "rsvp.errBring": "Please tell us if you're bringing someone.",
     "rsvp.sending": "Sending…", "foot.thanks": "We can't wait to celebrate with you.", "foot.contact": "Questions? Email us.", "sgn.story.script": "est. 2022", "sgn.story.strip": "<svg class=\"heart-sep\" viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M5,35 L22,12 L42,12 L50,28 L58,12 L78,12 L95,35 L50,98 Z\"/></svg> Zack & Louise <svg class=\"heart-sep\" viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M5,35 L22,12 L42,12 L50,28 L58,12 L78,12 L95,35 L50,98 Z\"/></svg> A Minesweeper romance <svg class=\"heart-sep\" viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M5,35 L22,12 L42,12 L50,28 L58,12 L78,12 L95,35 L50,98 Z\"/></svg>", "sgn.story.mast": "The Wedding Gazette", "sgn.story.dateline": "No. 001 — Saturday, Dec 12 2026", "sgn.sched.script": "showtime", "sgn.sched.ticker": "Welcome 18:00 · Ceremony 19:00 · Outdoors", "sgn.sched.mast": "Radio Z&L", "sgn.sched.mastsub": "Today's programme", "sgn.sched.onair": "On Air", "sgn.venue.script": "You'll find us at", "sgn.venue.main": "The Venue", "sgn.venue.strip": "<svg class=\"heart-sep\" viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M5,35 L22,12 L42,12 L50,28 L58,12 L78,12 L95,35 L50,98 Z\"/></svg> Chloe Gallery <svg class=\"heart-sep\" viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M5,35 L22,12 L42,12 L50,28 L58,12 L78,12 L95,35 L50,98 Z\"/></svg> District 7 · Sài Gòn <svg class=\"heart-sep\" viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M5,35 L22,12 L42,12 L50,28 L58,12 L78,12 L95,35 L50,98 Z\"/></svg>", "sgn.venue.postcard": "The Sunset Garden — Chloe Gallery", "sgn.venue.flip": "↻ Tap to flip", "sgn.dress.script": "Tailor", "sgn.dress.strip": "✦ Áo dài · Suit · Cocktail ✦ Earth tones ✦ Optional ✦", "sgn.faq.script": "☞ Please note", "sgn.faq.strip": "<svg class=\"heart-sep\" viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M5,35 L22,12 L42,12 L50,28 L58,12 L78,12 L95,35 L50,98 Z\"/></svg> Posted here <svg class=\"heart-sep\" viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M5,35 L22,12 L42,12 L50,28 L58,12 L78,12 L95,35 L50,98 Z\"/></svg>", "sgn.faq.stamp": "APPROVED", "sgn.gal.script": "Instant photo", "sgn.gal.strip": "<svg class=\"heart-sep\" viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M5,35 L22,12 L42,12 L50,28 L58,12 L78,12 L95,35 L50,98 Z\"/></svg> Portrait · Wedding · Keepsake <svg class=\"heart-sep\" viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M5,35 L22,12 L42,12 L50,28 L58,12 L78,12 L95,35 L50,98 Z\"/></svg> Prints in 24h <svg class=\"heart-sep\" viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M5,35 L22,12 L42,12 L50,28 L58,12 L78,12 L95,35 L50,98 Z\"/></svg>", "sgn.rsvp.script": "Respectfully", "sgn.rsvp.main": "You're Invited", "sgn.rsvp.strip": "<svg class=\"heart-sep\" viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M5,35 L22,12 L42,12 L50,28 L58,12 L78,12 L95,35 L50,98 Z\"/></svg> Zack & Louise <svg class=\"heart-sep\" viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M5,35 L22,12 L42,12 L50,28 L58,12 L78,12 L95,35 L50,98 Z\"/></svg> 12 December · 2026 <svg class=\"heart-sep\" viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M5,35 L22,12 L42,12 L50,28 L58,12 L78,12 L95,35 L50,98 Z\"/></svg> Chloe Gallery <svg class=\"heart-sep\" viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M5,35 L22,12 L42,12 L50,28 L58,12 L78,12 L95,35 L50,98 Z\"/></svg>", "story.p3": "On August 18, 2025, Sam's 6th birthday, they got engaged at Crescent Lake Park, the park where the three of them walk. The wedding is just a few steps from that very spot, so come and see how the story goes on.", "name.a": "Zack", "name.b": "Louise", "meta.title": "Zack & Louise — 12.12.2026", "meta.desc": "The wedding of Zack & Louise — 12 December 2026, Chloe Gallery, Sài Gòn.", "sched.1t": "Welcoming guests", "sched.2t": "Ceremony", "sched.3t": "Dinner", "sched.4t": "Closing ceremony", "stamp.initials": "Z&L", "sched.1d": "Welcome drinks and a warm hello as you find your seat.", "sched.2d": "A ceremony with our families, outdoors in the Sunset Garden. Please be seated by 18:45.", "sched.3d": "A set Vietnamese banquet menu.", "sched.4d": "Our thanks, a final toast, and goodnight."}, "vi": {"skip": "Bỏ qua đến nội dung", "nav.story": "Chuyện chúng mình", "nav.gallery": "Khoảnh khắc", "nav.schedule": "Chương trình", "nav.venue": "Địa điểm", "nav.dress": "Trang phục", "nav.faq": "Hỏi & Đáp", "nav.menu": "Danh mục", "nav.rsvp": "Phản hồi", "hero.pre": "Lễ thành hôn của", "hero.venue": "Chloe Gallery ◆ Sài Gòn", "hero.venueShort": "Sài Gòn", "cal.month": "Tháng 12", "cal.weekday": "Thứ Bảy", "cal.lunarDay": "Ngày <b>Canh Thân</b>", "cal.lunarDate": "4/11 Âm Lịch · Bính Ngọ", "hero.rsvp1": "PHẢN", "hero.rsvp2": "HỒI", "cd.days": "Ngày", "cd.hrs": "Giờ", "cd.hrsS": "Giờ", "cd.minS": "Phút", "cd.secS": "Giây", "cd.min": "Phút", "cd.sec": "Giây", "story.title": "Chuyện chúng mình", "story.lead": "Một hồ sơ không có mặt, phần giới thiệu chỉ có kỷ lục Dò Mìn, và một cô nàng bấm thích chỉ để chê chính trò chơi đó.", "story.p1": "Năm 2022, hồ sơ hẹn hò của Nhân không có lấy một tấm ảnh mặt, phần giới thiệu chỉ vỏn vẹn kỷ lục Dò Mìn của anh (khi đó 187 giây, nay 68 giây). Ngân bấm thích chỉ vì một lý do: chê chính trò chơi ấy. (Ai còn chơi Dò Mìn nữa?) Màn đấu khẩu dẫn tới buổi cà phê đầu tiên ở Marou, và từ đó đến giờ vẫn chưa hết vui.", "story.p2": "Rồi thành viên thứ ba xuất hiện: bé poodle Sam của Ngân. Sam nhìn hai người một lượt rồi tự phong mình làm con gái. Những buổi dạo bộ, một đống lông, và một gia đình ba người.", "ph.map": "Bản đồ sẽ hiển thị ở đây", "sched.title": "Chương trình buổi lễ", "sched.lead": "Một buổi tối dưới bầu trời mở, giữa Sunset Garden. Nhớ đến khi đang đói.", "venue.title": "Địa điểm & Đường đi", "sched.partAfternoon": "Buổi chiều · Lễ trao lời thề", "sched.partEvening": "Buổi tối · Tiệc mừng", "sched.v1t": "Đón khách", "sched.v1d": "Mời bạn đến từ 15:00 và an tọa.", "sched.v2t": "Lễ trao lời thề", "sched.v2d": "Nhân và Ngân trao lời thề, ngoài trời giữa Sunset Garden.", "sched.v3t": "Chụp ảnh", "sched.v3d": "Chúng mình mở màn chụp ảnh cùng các bạn.", "sgn.sched.tickerCer": "Đón khách 15:00 · Lễ thề 16:00 · Buổi tối 18:00", "sched.leadCer": "Một buổi chiều trao lời thề, rồi một buổi tối dưới bầu trời mở. Nhớ đến khi đang đói.", "rsvp.ceremonyNote": "Bạn cũng được mời đến lễ trao lời thề: đón khách từ 15:00, lễ lúc 16:00, rồi chụp ảnh khoảng 16:40 trước khi buổi tối bắt đầu.", "rsvp.badName": "Vui lòng nhập tên của bạn.", "venue.setL": "Không gian", "venue.setD": "Sunset Garden là sảnh mở ngoài trời. Lễ cưới và tiệc tối đều diễn ra ngoài trời.", "venue.addrL": "Địa chỉ", "venue.getL": "Đường đi", "venue.getD": "Khoảng 10 phút từ Crescent Mall. Grab / taxi trả khách ngay cổng chính.", "venue.parkL": "Gửi xe", "venue.parkD": "Miễn phí giữ ô tô và xe máy tại chỗ.", "venue.map": "Mở bản đồ", "dress.title": "Trang phục", "dress.lead": "Tùy ý — chỉ là gợi ý cho một tối Sài Gòn ấm áp, ngoài trời.", "dress.body": "Hoàn toàn tùy ý, cứ mặc theo cách bạn thấy thoải mái. Nếu muốn có gợi ý: trang phục cocktail, ưu tiên tông đất — vàng nghệ, kem, xanh lá, đỏ son. Áo dài luôn là lựa chọn đẹp. Nếu tiện, bạn nên tránh màu trắng nhé. Vì là buổi tối ngoài trời, giày bệt hoặc giày gót vuông sẽ thoải mái hơn gót nhọn, và một chiếc áo khoác mỏng sẽ tiện nếu trời có gió.", "faq.title": "Hỏi & Đáp", "faq.5q": "Tiệc cưới diễn ra trong nhà hay ngoài trời?", "faq.5a": "Ngoài trời. Lễ cưới và tiệc tối diễn ra tại Sunset Garden, Chloe Gallery, một sảnh mở. Buổi tối Sài Gòn khá ấm nên bạn nên mặc nhẹ nhàng, và có thể chọn giày bệt hoặc gót vuông.", "faq.1q": "Mình dẫn theo người đi cùng được không?", "faq.1a": "Đường dẫn thư mời đã được thiết lập đúng số chỗ chúng mình dành cho bạn. Nếu biểu mẫu hiện ô cho khách đi cùng nghĩa là đã bao gồm; nếu không thì lần này chỉ riêng bạn — và chúng mình rất vui vì bạn đến.", "faq.2q": "Trẻ em có được mời không?", "faq.2a": "Giống như khách đi cùng: đường dẫn thư mời đã được thiết lập đúng số chỗ chúng mình dành cho bạn. Nếu có chỗ cho các bé thì các bé rất được chào đón và đã bao gồm; chúng mình sẽ điều chỉnh đường dẫn riêng cho từng gia đình khi cần. Nếu không, lần này chúng mình xin dành buổi lễ cho khách người lớn.", "faq.3q": "Mình nên đến lúc mấy giờ?", "faq.3a": "Mở cửa 18:00. An tọa trước 18:45 để nghi thức bắt đầu đúng 19:00.", "faq.4q": "Có chỗ gửi xe không?", "faq.4a": "Có, miễn phí gửi xe tại địa điểm và dọc các tuyến đường xung quanh, tuy nhiên chỗ có hạn vào buổi tối đông khách. Tài xế có thể cho khách xuống ngay cổng trước. Nếu bãi đã đầy, bãi gửi xe có phí của Crescent Mall ở ngay gần đó.", "gal.title": "Khoảnh khắc", "gal.lead": "Một vài khoảnh khắc chúng mình yêu thích.", "gal.openHint": "chạm để mở", "gal.cover": "Bìa sách", "gal.backCover": "Bìa sau", "gal.page": "Trang {n} / {t}", "gal.prevAria": "Trang trước", "gal.nextAria": "Trang sau", "rsvp.title": "Bạn sẽ đến chứ?", "rsvp.greet": "Thân gửi", "rsvp.guest": "bạn", "rsvp.attendL": "Bạn sẽ tham dự chứ?", "rsvp.yes": "Vui mừng nhận lời", "rsvp.no": "Tiếc là không thể đến", "rsvp.nameL": "Tên của bạn", "rsvp.namePh": "Họ và tên", "rsvp.plusL": "Khách đi cùng", "rsvp.emailL": "Email (để nhận xác nhận)", "rsvp.noteL": "Lời nhắn cho chúng mình (không bắt buộc)", "rsvp.notePh": "Một lời nhắn, hoặc điều chúng mình nên biết.", "rsvp.submit": "Niêm phong & gửi", "rsvp.deadline": "Đóng dấu bưu điện chậm nhất ngày 15 tháng 11, 2026.", "rsvp.doneT": "Cảm ơn bạn!", "rsvp.doneD": "Phản hồi của bạn đã được ghi nhận. Thư xác nhận đang được gửi đến hộp thư của bạn.",
     "rsvp.doneNoMail": "Phản hồi đã được ghi nhận nhưng chúng mình chưa gửi được thư xác nhận. Hãy giữ đường dẫn này để chỉnh sửa.",
     "rsvp.noCode": "Vui lòng mở đường dẫn RSVP riêng trong thiệp mời của bạn.",
@@ -1189,6 +1223,11 @@ footer a{color:var(--ivory);text-decoration:underline}
     "rsvp.loadFail": "Không tải được thiệp mời. Vui lòng tải lại trang hoặc liên hệ chúng mình.",
     "rsvp.sendFail": "Gửi phản hồi không thành công. Vui lòng thử lại hoặc email cho chúng mình.",
     "rsvp.badEmail": "Vui lòng nhập email hợp lệ.",
+    "rsvp.partsL": "Bạn sẽ tham dự phần nào?", "rsvp.partsBoth": "Lễ & tiệc tối · từ 15:00", "rsvp.partsEve": "Chỉ tiệc tối · từ 18:00",
+    "rsvp.bringL": "Bạn có đi cùng ai không?", "rsvp.bringYes": "Có, mình đi cùng một người", "rsvp.bringNo": "Không, chỉ mình mình",
+    "rsvp.plusNameL": "Tên người đi cùng (không bắt buộc)", "rsvp.plusHint": "Chưa biết cũng không sao. Bạn có thể sửa câu trả lời đến hết 15/11.",
+    "rsvp.plusJoinL": "Người đi cùng sẽ tham dự", "rsvp.plusSame": "Giống mình", "rsvp.plusEve": "Chỉ tiệc tối",
+    "rsvp.errAttend": "Hãy cho chúng mình biết bạn có đến được không.", "rsvp.errParts": "Vui lòng chọn phần bạn sẽ tham dự.", "rsvp.errBring": "Vui lòng cho biết bạn có đi cùng ai không.",
     "rsvp.sending": "Đang gửi…", "foot.thanks": "Chúng mình rất mong được chung vui cùng bạn.", "foot.contact": "Có câu hỏi? Email cho chúng mình.", "sgn.story.script": "est. 2022", "sgn.story.strip": "<svg class=\"heart-sep\" viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M5,35 L22,12 L42,12 L50,28 L58,12 L78,12 L95,35 L50,98 Z\"/></svg> Nhân & Ngân <svg class=\"heart-sep\" viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M5,35 L22,12 L42,12 L50,28 L58,12 L78,12 L95,35 L50,98 Z\"/></svg> Chuyện tình Dò Mìn <svg class=\"heart-sep\" viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M5,35 L22,12 L42,12 L50,28 L58,12 L78,12 L95,35 L50,98 Z\"/></svg>", "sgn.story.mast": "Nhựt Báo Hôn Lễ", "sgn.story.dateline": "Số 001 — Thứ Bảy, 12.12.2026", "sgn.sched.script": "suất chiếu", "sgn.sched.ticker": "Đón khách 18:00 · Nghi thức 19:00 · Ngoài trời", "sgn.sched.mast": "Đài N&N", "sgn.sched.mastsub": "Chương trình hôm nay", "sgn.sched.onair": "Đang Phát", "sgn.venue.script": "Đường đến", "sgn.venue.main": "Địa điểm", "sgn.venue.strip": "<svg class=\"heart-sep\" viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M5,35 L22,12 L42,12 L50,28 L58,12 L78,12 L95,35 L50,98 Z\"/></svg> Chloe Gallery <svg class=\"heart-sep\" viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M5,35 L22,12 L42,12 L50,28 L58,12 L78,12 L95,35 L50,98 Z\"/></svg> Quận 7 · Sài Gòn <svg class=\"heart-sep\" viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M5,35 L22,12 L42,12 L50,28 L58,12 L78,12 L95,35 L50,98 Z\"/></svg>", "sgn.venue.postcard": "Sunset Garden — Chloe Gallery", "sgn.venue.flip": "↻ Chạm để lật", "sgn.dress.script": "Nhà may", "sgn.dress.strip": "✦ Áo dài · Com-plê · Đầm dạ hội ✦ Tông đất ✦ Tùy ý ✦", "sgn.faq.script": "☞ Xin lưu ý", "sgn.faq.strip": "<svg class=\"heart-sep\" viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M5,35 L22,12 L42,12 L50,28 L58,12 L78,12 L95,35 L50,98 Z\"/></svg> Niêm yết tại đây <svg class=\"heart-sep\" viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M5,35 L22,12 L42,12 L50,28 L58,12 L78,12 L95,35 L50,98 Z\"/></svg>", "sgn.faq.stamp": "ĐÃ DUYỆT", "sgn.gal.script": "Chụp hình lấy liền", "sgn.gal.strip": "<svg class=\"heart-sep\" viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M5,35 L22,12 L42,12 L50,28 L58,12 L78,12 L95,35 L50,98 Z\"/></svg> Chân dung · Cưới hỏi · Kỷ niệm <svg class=\"heart-sep\" viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M5,35 L22,12 L42,12 L50,28 L58,12 L78,12 L95,35 L50,98 Z\"/></svg> Rửa ảnh 24h <svg class=\"heart-sep\" viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M5,35 L22,12 L42,12 L50,28 L58,12 L78,12 L95,35 L50,98 Z\"/></svg>", "sgn.rsvp.script": "Trân trọng", "sgn.rsvp.main": "Kính mời", "sgn.rsvp.strip": "<svg class=\"heart-sep\" viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M5,35 L22,12 L42,12 L50,28 L58,12 L78,12 L95,35 L50,98 Z\"/></svg> Nhân & Ngân <svg class=\"heart-sep\" viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M5,35 L22,12 L42,12 L50,28 L58,12 L78,12 L95,35 L50,98 Z\"/></svg> 12 tháng 12 · 2026 <svg class=\"heart-sep\" viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M5,35 L22,12 L42,12 L50,28 L58,12 L78,12 L95,35 L50,98 Z\"/></svg> Chloe Gallery <svg class=\"heart-sep\" viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M5,35 L22,12 L42,12 L50,28 L58,12 L78,12 L95,35 L50,98 Z\"/></svg>", "story.p3": "Ngày 18/8/2025, đúng sinh nhật lần thứ 6 của Sam, hai người đính hôn tại công viên Hồ Bán Nguyệt (Crescent Lake), nơi cả nhà vẫn dắt Sam đi dạo. Đám cưới sẽ diễn ra chỉ cách chỗ đó vài bước chân, mời bạn đến xem câu chuyện viết tiếp.", "name.a": "Nhân", "name.b": "Ngân", "meta.title": "Nhân & Ngân — 12.12.2026", "meta.desc": "Lễ thành hôn của Nhân & Ngân — 12 tháng 12, 2026, Chloe Gallery, Sài Gòn.", "sched.1t": "Đón khách", "sched.2t": "Nghi thức thành hôn", "sched.3t": "Tiệc tối", "sched.4t": "Tiễn khách", "stamp.initials": "N&N", "sched.1d": "Thức uống chào mừng và lời chào thân tình khi bạn vào chỗ.", "sched.2d": "Buổi lễ cùng gia đình hai bên, ngoài trời giữa Sunset Garden. Xin an tọa trước 18:45.", "sched.3d": "Thực đơn tiệc cưới Việt Nam định sẵn.", "sched.4d": "Lời cảm ơn, một ly chúc cuối cùng và lời chúc ngủ ngon."}};
   var lang = "en";
   try{ var s = localStorage.getItem("wed_lang"); if(s==="vi"||s==="en") lang = s; }catch(e){}
@@ -1278,7 +1317,8 @@ footer a{color:var(--ivory);text-decoration:underline}
   var form = document.getElementById("rsvpForm");
   var statusEl = document.getElementById("rsvpStatus");
   var submitBtn = form.querySelector('[type="submit"]');
-  var plusWrap = document.getElementById("plusWrap"), plusList = document.getElementById("plusList");
+  var partsWrap = document.getElementById("partsWrap"), bringWrap = document.getElementById("bringWrap");
+  var plusWrap = document.getElementById("plusWrap"), plusPartsWrap = document.getElementById("plusPartsWrap");
   var nameInput = form.elements.guest1, greetName = document.getElementById("rsvpName");
   var statusKey = null;
   function setStatus(key){
@@ -1294,11 +1334,45 @@ footer a{color:var(--ivory);text-decoration:underline}
   function endpointUrl(params){
     return CONFIG.rsvpEndpoint + (CONFIG.rsvpEndpoint.indexOf("?")<0 ? "?" : "&") + params;
   }
-  function syncPlusVisibility(){
-    var attending = form.elements.attending.value === "yes";
-    plusWrap.hidden = !(attending && plusList.children.length);
+  // Which questions show depends on the answers so far and on the invitation tier:
+  // parts (ceremony codes) -> plus-one yes/no (plus-one codes) -> the guest's name and, for ceremony codes, their parts.
+  // A guest who is evening-only can't bring a plus-one to the ceremony, so that question is skipped for them.
+  function syncFields(){
+    var f = form.elements, t = tier || DEFAULT_TIER;
+    var attending = f.attending.value === "yes";
+    var bringing = attending && t.plus > 0 && f.bringing.value === "yes";
+    partsWrap.hidden = !(attending && t.ceremony);
+    bringWrap.hidden = !(attending && t.plus > 0);
+    plusWrap.hidden = !bringing;
+    plusPartsWrap.hidden = !(bringing && t.ceremony && f.joining.value === "ceremony");
   }
-  form.querySelectorAll('input[name="attending"]').forEach(function(r){ r.addEventListener("change", syncPlusVisibility); });
+  function errText(key){ return (I18N[lang] && I18N[lang][key]) || I18N.en[key] || ""; }
+  function showErr(field, key){
+    var el = form.querySelector('[data-err="' + field + '"]');
+    if(!el) return;
+    el.hidden = !key; el.setAttribute("data-key", key || "");
+    el.textContent = key ? errText(key) : "";
+  }
+  function clearErr(e){
+    var n = e.target.name, map = { guest1: "name" };
+    showErr(map[n] || n, null);
+  }
+  form.addEventListener("input", clearErr);
+  form.addEventListener("change", function(e){ clearErr(e); syncFields(); });
+  // keep any visible error in the right language when the toggle flips
+  var origApplyLang2 = applyLang;
+  applyLang = function(l){ origApplyLang2(l); form.querySelectorAll(".field-err[data-key]").forEach(function(el){ var k = el.getAttribute("data-key"); if(k) el.textContent = errText(k); }); };
+  // returns the first missing answer as {field, key, el}, or null when the form is complete
+  function firstProblem(){
+    var f = form.elements, t = tier || DEFAULT_TIER;
+    var attending = f.attending.value;
+    if(!attending) return { field: "attending", key: "rsvp.errAttend", el: f.attending[0] };
+    if(!f.guest1.value.trim()) return { field: "name", key: "rsvp.badName", el: f.guest1 };
+    if(attending === "yes" && t.ceremony && !f.joining.value) return { field: "joining", key: "rsvp.errParts", el: f.joining[0] };
+    if(attending === "yes" && t.plus > 0 && !f.bringing.value) return { field: "bringing", key: "rsvp.errBring", el: f.bringing[0] };
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.email.value.trim())) return { field: "email", key: "rsvp.badEmail", el: f.email };
+    return null;
+  }
   // "Dear ___" follows what the guest types; with nothing typed it falls back to the translated "guest"
   function syncGreet(){
     var v = nameInput.value.trim();
@@ -1318,15 +1392,8 @@ footer a{color:var(--ivory);text-decoration:underline}
   }
 
   function applyTier(t){
-    plusList.innerHTML = "";
-    for(var i=0;i<t.plus;i++){
-      var inp = document.createElement("input");
-      inp.type = "text"; inp.name = "plus"+(i+1); inp.setAttribute("autocomplete","off");
-      inp.placeholder = (I18N[lang]["rsvp.namePh"]||"Full name")+" "+(i+2);
-      plusList.appendChild(inp);
-    }
     if(t.ceremony) showCeremony();
-    syncPlusVisibility();
+    syncFields();
   }
 
   // saved reply for this email (edit links) + whether the deadline has passed
@@ -1335,11 +1402,14 @@ footer a{color:var(--ivory);text-decoration:underline}
     if(r){
       form.elements.attending.value = String(r.attending).toLowerCase()==="no" ? "no" : "yes";
       nameInput.value = r.name || ""; syncGreet();
-      (r.plus||[]).forEach(function(n,i){ if(form.elements["plus"+(i+1)]) form.elements["plus"+(i+1)].value = n; });
+      if(r.joining) form.elements.joining.value = r.joining;
+      if(r.bringing) form.elements.bringing.value = String(r.bringing).toLowerCase() === "yes" ? "yes" : "no";
+      form.elements.plus1.value = r.plus || "";
+      form.elements.plusJoining.value = r.plusJoining === "evening" ? "evening" : "same";
       form.elements.email.value = r.email || "";
       form.elements.note.value = r.note || "";
     } else if(editEmail){ form.elements.email.value = editEmail; }
-    syncPlusVisibility();
+    syncFields();
     if(j.closed){ setStatus("rsvp.closed"); lockForm(); }
   }
 
@@ -1357,10 +1427,20 @@ footer a{color:var(--ivory);text-decoration:underline}
 
   form.addEventListener("submit", function(e){
     e.preventDefault();
-    if(!form.reportValidity()) return;
-    var data = Object.fromEntries(new FormData(form).entries());
-    data.code = code; data.lang = lang; data.tier = tier.label; data.ceremony = tier.ceremony;
     if(!tier) return;
+    var bad = firstProblem();
+    if(bad){ showErr(bad.field, bad.key); bad.el.focus(); return; }
+    var f = form.elements, yes = f.attending.value === "yes";
+    var joining = !yes ? "" : (tier.ceremony ? f.joining.value : "evening");
+    var bringing = yes && tier.plus > 0 && f.bringing.value === "yes";
+    var data = {
+      code: code, lang: lang, tier: tier.label, ceremony: tier.ceremony, plus: tier.plus,
+      attending: f.attending.value, guest1: f.guest1.value, email: f.email.value, note: f.note.value,
+      joining: joining,
+      bringing: yes && tier.plus > 0 ? f.bringing.value : "",
+      plus1: bringing ? f.plus1.value : "",
+      plusJoining: bringing ? (joining === "ceremony" && f.plusJoining.value === "same" ? "ceremony" : "evening") : ""
+    };
     submitBtn.disabled = true; setStatus("rsvp.sending");
     // text/plain keeps this a "simple" request (no CORS preflight); Apps Script answers
     // with a readable JSON body, so real failures (closed, bad email/name, server) surface here.
