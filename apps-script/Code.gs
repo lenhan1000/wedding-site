@@ -14,7 +14,7 @@
  */
 
 var DEADLINE = new Date("2026-11-15T23:59:59+07:00"); // end of 15 Nov, Saigon time
-var SITE_URL = "https://REPLACE-ME.github.io/wedding-site/"; // used in the confirmation email link
+var SITE_URL = "https://lenhan1000.github.io/wedding-site/"; // used in the confirmation email edit link (keep the trailing slash)
 var MAX_PLUS = 4;
 
 var RSVP_HEADERS = ["Email", "Updated", "Code", "Tier", "Ceremony", "Attending", "Name", "Plus-ones", "Note"];
