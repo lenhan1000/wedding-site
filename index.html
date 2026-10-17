@@ -686,6 +686,7 @@ section{padding-block:clamp(3rem,6.5vw,5rem);position:relative}
 .choice label{display:flex;align-items:center;justify-content:center;gap:.5rem;flex:1 1 160px;border:1.5px solid var(--hair);border-radius:2px;padding:.55rem .9rem;cursor:pointer;font-size:.9rem;background:#FCF7EA}
 .choice input{accent-color:var(--lacquer)}
 .plus-list{display:grid;gap:.6rem}
+#rsvp{scroll-margin-top:5.5rem}   /* #rsvp is the form itself: links land straight on it, clear of the sticky nav */
 .field-err{margin:0;font-size:.82rem;color:var(--lacquer);font-weight:600}
 .field-hint{margin:0;font-size:.8rem;color:var(--ink-soft)}
 .rsvp-actions{margin-top:1.7rem}
@@ -1073,7 +1074,7 @@ footer a{color:var(--ivory);text-decoration:underline}
     </div>
   </section>
 
-  <section id="rsvp" class="band-palm">
+  <section class="band-palm">
     <div class="merlon-edge c-palm" aria-hidden="true"></div>
     <div class="wrap">
       <div class="sign s-rsvp rv">
@@ -1084,7 +1085,7 @@ footer a{color:var(--ivory);text-decoration:underline}
         <span class="main" data-i18n="sgn.rsvp.main">You&#8217;re Invited</span>
         <span class="strip" data-i18n-html="sgn.rsvp.strip">&#9670; Zack &amp; Louise &#9670; 12 December &middot; 2026 &#9670; Chloe Gallery &#9670;</span>
       </div>
-      <form class="rsvp-card rv" id="rsvpForm" novalidate>
+      <form class="rsvp-card rv" id="rsvp" novalidate>
         <span class="paravion">Par Avion &middot; M&#225;y Bay</span>
         <span class="plane" aria-hidden="true">&#9992;</span>
         <span class="stamp"><img src="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2066%2078%27%3E%3Cdefs%3E%3Cmask%20id%3D%27m%27%3E%3Crect%20width%3D%2766%27%20height%3D%2778%27%20fill%3D%27%23fff%27%2F%3E%3Ccircle%20cx%3D%273%27%20cy%3D%270%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%273%27%20cy%3D%2778%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%279%27%20cy%3D%270%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%279%27%20cy%3D%2778%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%2715%27%20cy%3D%270%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%2715%27%20cy%3D%2778%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%2721%27%20cy%3D%270%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%2721%27%20cy%3D%2778%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%2727%27%20cy%3D%270%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%2727%27%20cy%3D%2778%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%2733%27%20cy%3D%270%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%2733%27%20cy%3D%2778%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%2739%27%20cy%3D%270%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%2739%27%20cy%3D%2778%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%2745%27%20cy%3D%270%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%2745%27%20cy%3D%2778%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%2751%27%20cy%3D%270%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%2751%27%20cy%3D%2778%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%2757%27%20cy%3D%270%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%2757%27%20cy%3D%2778%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%2763%27%20cy%3D%270%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%2763%27%20cy%3D%2778%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%270%27%20cy%3D%273%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%2766%27%20cy%3D%273%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%270%27%20cy%3D%279%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%2766%27%20cy%3D%279%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%270%27%20cy%3D%2715%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%2766%27%20cy%3D%2715%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%270%27%20cy%3D%2721%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%2766%27%20cy%3D%2721%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%270%27%20cy%3D%2727%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%2766%27%20cy%3D%2727%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%270%27%20cy%3D%2733%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%2766%27%20cy%3D%2733%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%270%27%20cy%3D%2739%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%2766%27%20cy%3D%2739%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%270%27%20cy%3D%2745%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%2766%27%20cy%3D%2745%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%270%27%20cy%3D%2751%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%2766%27%20cy%3D%2751%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%270%27%20cy%3D%2757%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%2766%27%20cy%3D%2757%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%270%27%20cy%3D%2763%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%2766%27%20cy%3D%2763%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%270%27%20cy%3D%2769%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%2766%27%20cy%3D%2769%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%270%27%20cy%3D%2775%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3Ccircle%20cx%3D%2766%27%20cy%3D%2775%27%20r%3D%272.4%27%20fill%3D%27%23000%27%2F%3E%3C%2Fmask%3E%3C%2Fdefs%3E%3Crect%20x%3D%271%27%20y%3D%271%27%20width%3D%2764%27%20height%3D%2776%27%20fill%3D%27%23F5EDDD%27%20mask%3D%27url%28%23m%29%27%2F%3E%3Crect%20x%3D%275%27%20y%3D%275%27%20width%3D%2756%27%20height%3D%2768%27%20fill%3D%27none%27%20stroke%3D%27%23B5482E%27%20stroke-width%3D%271%27%20opacity%3D%27.5%27%2F%3E%3Cg%20transform%3D%27translate%2813%2C11%29%27%20fill%3D%27none%27%20stroke%3D%27%23B5482E%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%3E%3Ccircle%20cx%3D%2715%27%20cy%3D%2711%27%20r%3D%274%27%2F%3E%3Ccircle%20cx%3D%2726%27%20cy%3D%2712%27%20r%3D%273.4%27%2F%3E%3Cpath%20d%3D%27M8%2C35%20q0%2C-13%207%2C-14%20q6%2C1%206%2C8%27%2F%3E%3Cpath%20d%3D%27M20%2C35%20q1%2C-12%207%2C-13%20q5%2C1%205%2C10%27%2F%3E%3C%2Fg%3E%3Ccircle%20cx%3D%2731%27%20cy%3D%2720%27%20r%3D%272.6%27%20fill%3D%27%23B8912F%27%2F%3E%3Ctext%20x%3D%2733%27%20y%3D%2770%27%20font-size%3D%276.2%27%20fill%3D%27%23B5482E%27%20text-anchor%3D%27middle%27%20font-family%3D%27serif%27%20letter-spacing%3D%27.5%27%3E12%20%26%23183%3B%20XII%20%26%23183%3B%2026%3C%2Ftext%3E%3C%2Fsvg%3E" alt="" aria-hidden="true"></span>
@@ -1314,7 +1315,7 @@ footer a{color:var(--ivory);text-decoration:underline}
   var code = qs.get("c") || "";
   var editEmail = qs.get("e") || "";
   var tier = !code ? DEFAULT_TIER : (TIERS[code.toLowerCase()] || null);
-  var form = document.getElementById("rsvpForm");
+  var form = document.getElementById("rsvp");
   var statusEl = document.getElementById("rsvpStatus");
   var submitBtn = form.querySelector('[type="submit"]');
   var partsWrap = document.getElementById("partsWrap"), bringWrap = document.getElementById("bringWrap");
@@ -1423,6 +1424,14 @@ footer a{color:var(--ivory);text-decoration:underline}
         .then(function(j){ if(j.ok) applyServerState(j); })
         .catch(function(err){ console.error("RSVP state lookup failed", err); });   // form still works; POST reports real errors
     }
+  }
+
+  // #rsvp lands on the form itself, not the sign above it. The browser jumps before images and
+  // fonts settle and the layout shifts, so line it up again once the page has loaded.
+  if(location.hash === "#rsvp"){
+    var realign = function(){ form.scrollIntoView({behavior:"instant", block:"start"}); };
+    if(document.readyState === "complete") realign(); else window.addEventListener("load", realign);
+    if(document.fonts && document.fonts.ready) document.fonts.ready.then(realign);
   }
 
   form.addEventListener("submit", function(e){

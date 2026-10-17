@@ -10,6 +10,7 @@ import segno
 from PIL import Image, ImageDraw
 
 URL = sys.argv[1] if len(sys.argv) > 1 else "https://lenhan1000.github.io/wedding-site/"
+NAME = sys.argv[2] if len(sys.argv) > 2 else "wedding-qr"   # output file stem
 IVORY, PALM, LACQUER, GOLD = "#F5EDDD", "#2C4E2A", "#B5482E", "#B8912F"
 QUIET, FRAME = 4, 2.6          # modules of quiet zone, extra decorative margin
 # the site's faceted heart (same path as .heart-sep / .sb-names .heart in index.html), bbox x5-95, y12-98
@@ -21,8 +22,9 @@ m = [list(r) for r in qr.matrix]
 n = len(m)
 size = n + 2 * (QUIET + FRAME)
 off = QUIET + FRAME
-c = n // 2                      # centre module; clear a 5x5 block for the heart
-clear = lambda x, y: abs(x - c) <= 2 and abs(y - c) <= 2
+c = n // 2                      # centre module; clear a block for the heart
+R = 2 if n <= 37 else 1         # 5x5 for short links; denser codes (longer URLs) only tolerate 3x3 and still scan reliably
+clear = lambda x, y: abs(x - c) <= R and abs(y - c) <= R
 in_finder = lambda x, y: ((x < 8 and y < 8) or (x >= n - 8 and y < 8) or (x < 8 and y >= n - 8))
 finders = [(0, 0), (n - 7, 0), (0, n - 7)]
 
@@ -42,13 +44,13 @@ for fx, fy in finders:
     s.append(f'<rect x="{X:g}" y="{Y:g}" width="7" height="7" rx="1.6" fill="{LACQUER}"/>')
     s.append(f'<rect x="{X+1:g}" y="{Y+1:g}" width="5" height="5" rx="1.3" fill="{IVORY}"/>')
     s.append(f'<rect x="{X+2:g}" y="{Y+2:g}" width="3" height="3" rx="1" fill="{PALM}"/>')
-hs = 3.6 / 90                      # heart ~3.6 modules wide, inside the cleared 5x5
+hs = (3.6 if R == 2 else 2.7) / 90   # heart ~3.6 modules wide (2.7 for the 3x3 clear), inside the cleared block
 hx, hy = off + c + .5 - 50 * hs, off + c + .5 - 55 * hs   # bbox centre (50,55) on the centre module
 s.append(f'<path fill="{LACQUER}" transform="translate({hx:g} {hy:g}) scale({hs:g})" d="{HEART_D}"/>')
 s.append('</svg>')
 out = os.path.join(os.path.dirname(__file__), "..", "assets", "qr")
 os.makedirs(out, exist_ok=True)
-open(os.path.join(out, "wedding-qr.svg"), "w", encoding="utf-8").write("\n".join(s))
+open(os.path.join(out, NAME + ".svg"), "w", encoding="utf-8").write("\n".join(s))
 
 # ---------- PNG (same geometry, 4x supersampled) ----------
 U, SS = 50, 4
@@ -74,5 +76,5 @@ d.polygon(poly, fill=LACQUER)
 mask = Image.new("L", (W, W), 0)
 ImageDraw.Draw(mask).rounded_rectangle([0, 0, W-1, W-1], radius=px(2.4), fill=255)
 im = im.convert("RGBA"); im.putalpha(mask)
-im.resize((1200, 1200), Image.LANCZOS).save(os.path.join(out, "wedding-qr.png"))
+im.resize((1200, 1200), Image.LANCZOS).save(os.path.join(out, NAME + ".png"))
 print("modules", n, "->", os.path.abspath(out))
