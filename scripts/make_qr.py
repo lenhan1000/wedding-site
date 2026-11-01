@@ -11,7 +11,9 @@ from PIL import Image, ImageDraw
 
 URL = sys.argv[1] if len(sys.argv) > 1 else "https://lenhan1000.github.io/wedding-site/"
 NAME = sys.argv[2] if len(sys.argv) > 2 else "wedding-qr"   # output file stem
-IVORY, PALM, LACQUER, GOLD = "#F5EDDD", "#2C4E2A", "#B5482E", "#B8912F"
+WHITE = len(sys.argv) > 3 and sys.argv[3] == "white"   # pure white square background: easiest to scan, no cream tint or transparent corners
+IVORY, PALM, LACQUER, GOLD = ("#FFFFFF" if WHITE else "#F5EDDD"), "#2C4E2A", "#B5482E", "#B8912F"
+CORNER = 0 if WHITE else 2.4
 QUIET, FRAME = 4, 2.6          # modules of quiet zone, extra decorative margin
 # the site's faceted heart (same path as .heart-sep / .sb-names .heart in index.html), bbox x5-95, y12-98
 HEART = [(5,35),(22,12),(42,12),(50,28),(58,12),(78,12),(95,35),(50,98)]
@@ -30,7 +32,7 @@ finders = [(0, 0), (n - 7, 0), (0, n - 7)]
 
 # ---------- SVG ----------
 s = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {size:g} {size:g}" width="1200" height="1200" shape-rendering="geometricPrecision">',
-     f'<rect width="{size:g}" height="{size:g}" rx="2.4" fill="{IVORY}"/>',
+     f'<rect width="{size:g}" height="{size:g}" rx="{CORNER}" fill="{IVORY}"/>',
      f'<rect x=".7" y=".7" width="{size-1.4:g}" height="{size-1.4:g}" rx="1.9" fill="none" stroke="{GOLD}" stroke-width=".28"/>',
      f'<rect x="1.35" y="1.35" width="{size-2.7:g}" height="{size-2.7:g}" rx="1.4" fill="none" stroke="{GOLD}" stroke-width=".12"/>',
      f'<g fill="{PALM}">']
@@ -75,6 +77,7 @@ d.polygon(poly, fill=LACQUER)
 # round the outer card corners (transparent outside)
 mask = Image.new("L", (W, W), 0)
 ImageDraw.Draw(mask).rounded_rectangle([0, 0, W-1, W-1], radius=px(2.4), fill=255)
-im = im.convert("RGBA"); im.putalpha(mask)
+im = im.convert("RGBA")
+if not WHITE: im.putalpha(mask)
 im.resize((1200, 1200), Image.LANCZOS).save(os.path.join(out, NAME + ".png"))
 print("modules", n, "->", os.path.abspath(out))
