@@ -1174,8 +1174,8 @@ footer a{color:var(--ivory);text-decoration:underline}
             <span class="rail a"></span><span class="rail b"></span>
             <div class="faq">
               <details open><summary data-i18n="faq.5q">Is the wedding indoors or outdoors?</summary><p data-i18n="faq.5a">Outdoors. The ceremony and dinner take place in the Sunset Garden at Chloe Gallery, an open-air hall. Sài Gòn evenings are warm, so dress light, and consider flats or block heels.</p></details>
-              <details><summary data-i18n="faq.1q">Can I bring a plus-one?</summary><p data-i18n="faq.1a">Your invitation link is set for exactly the seats we've saved.</p></details>
-              <details><summary data-i18n="faq.2q">Are kids welcome?</summary><p data-i18n="faq.2a">Same as plus-ones: your invitation link is set for exactly the seats we've saved for you. If it has room for little ones, they're welcome and included, and we'll customise family links where needed. If not, we're keeping this celebration to adult guests.</p></details>
+              <details class="faq-seats"><summary data-i18n="faq.1q">Can I bring a plus-one?</summary><p data-i18n="faq.1a">Your invitation link is set for exactly the seats we've saved.</p></details>
+              <details class="faq-seats"><summary data-i18n="faq.2q">Are kids welcome?</summary><p data-i18n="faq.2a">Same as plus-ones: your invitation link is set for exactly the seats we've saved for you. If it has room for little ones, they're welcome and included, and we'll customise family links where needed. If not, we're keeping this celebration to adult guests.</p></details>
               <details><summary data-i18n="faq.3q">What time should I arrive?</summary><p data-i18n="faq.3a">Doors at 18:00.</p></details>
               <details><summary data-i18n="faq.4q">Is there parking?</summary><p data-i18n="faq.4a">Yes, free parking is available at the venue and along the surrounding streets, though spaces are limited on a busy evening. Drivers can drop guests at the entrance first. If the lot is full, the paid parking at Crescent Mall is nearby.</p></details>
             </div>
@@ -1393,6 +1393,8 @@ footer a{color:var(--ivory);text-decoration:underline}
   }
 
   function applyTier(t){
+    // the open (no-code) invitation has no extra seats, so the plus-one and kids questions don't apply to it
+    if(t === DEFAULT_TIER) document.querySelectorAll(".faq-seats").forEach(function(el){ el.hidden = true; });
     if(t.ceremony) showCeremony();
     syncFields();
   }
