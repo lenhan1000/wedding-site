@@ -31,9 +31,8 @@ var EMAIL_COPY = {
     progMast: "Radio Z&L", progSub: "Today’s programme", onAir: "On air",
     partAfternoon: "Afternoon · Vow ceremony", partEvening: "Evening · Celebration",
     rows: {
-      v1: ["15:00", "Welcoming guests", "Please arrive from 15:00 and find your seat."],
-      v2: ["16:00", "Vow ceremony", "Zack and Louise exchange their vows, outdoors in the Sunset Garden."],
-      v3: ["16:40", "Photos", "We open the floor for pictures together."],
+      v1: ["16:00", "Welcoming guests", "Please arrive from 16:00 and find your seat."],
+      v2: ["16:30", "Vow ceremony", "Zack and Louise exchange their vows, outdoors in the Sunset Garden."],
       e1: ["18:00", "Welcoming guests", "Welcome drinks and a warm hello as you find your seat."],
       e2: ["19:00", "Ceremony", "A ceremony with our families, outdoors in the Sunset Garden. Please be seated by 18:45."],
       e3: ["19:30", "Dinner", "A set Vietnamese banquet menu."],
@@ -58,9 +57,8 @@ var EMAIL_COPY = {
     progMast: "Đài N&N", progSub: "Chương trình hôm nay", onAir: "Đang phát",
     partAfternoon: "Buổi chiều · Lễ trao lời thề", partEvening: "Buổi tối · Tiệc mừng",
     rows: {
-      v1: ["15:00", "Đón khách", "Mời bạn đến từ 15:00 và an tọa."],
-      v2: ["16:00", "Lễ trao lời thề", "Nhân và Ngân trao lời thề, ngoài trời giữa Sunset Garden."],
-      v3: ["16:40", "Chụp ảnh", "Chúng mình mở màn chụp ảnh cùng các bạn."],
+      v1: ["16:00", "Đón khách", "Mời bạn đến từ 16:00 và an tọa."],
+      v2: ["16:30", "Lễ trao lời thề", "Nhân và Ngân trao lời thề, ngoài trời giữa Sunset Garden."],
       e1: ["18:00", "Đón khách", "Thức uống chào mừng và lời chào thân tình khi bạn vào chỗ."],
       e2: ["19:00", "Nghi thức thành hôn", "Buổi lễ cùng gia đình hai bên, ngoài trời giữa Sunset Garden. Xin an tọa trước 18:45."],
       e3: ["19:30", "Tiệc tối", "Thực đơn tiệc cưới Việt Nam định sẵn."],
@@ -86,10 +84,10 @@ function emailEsc_(s) {
   return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-// Google Calendar "add event" link. Ceremony guests start at 15:00 ICT (08:00Z), everyone else 18:00 (11:00Z).
+// Google Calendar "add event" link. Ceremony guests start at 16:00 ICT (09:00Z), everyone else 18:00 (11:00Z).
 function emailCalUrl_(lang, ceremony) {
   var c = EMAIL_COPY[lang];
-  var start = ceremony ? "20261212T080000Z" : "20261212T110000Z", end = "20261212T143000Z";
+  var start = ceremony ? "20261212T090000Z" : "20261212T110000Z", end = "20261212T143000Z";
   return "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" + encodeURIComponent(c.couple + " — " + (lang === "vi" ? "Tiệc cưới" : "Wedding")) +
     "&dates=" + start + "/" + end + "&location=" + encodeURIComponent("Chloe Gallery, " + EMAIL_ADDRESS) +
     "&details=" + encodeURIComponent(c.venueNote);
@@ -138,7 +136,7 @@ function buildEmail_(o) {
   var programme = "";
   if (attending) {
     var inner = "";
-    if (ceremony) inner += emailPart_(c.partAfternoon) + emailRows_(c, ["v1", "v2", "v3"]) + emailPart_(c.partEvening);
+    if (ceremony) inner += emailPart_(c.partAfternoon) + emailRows_(c, ["v1", "v2"]) + emailPart_(c.partEvening);
     inner += emailRows_(c, ["e1", "e2", "e3", "e4"]);
     programme =
       '<tr><td colspan="2" style="padding:26px 0 0;">' +
@@ -221,10 +219,106 @@ function buildEmail_(o) {
   if (attending) {
     t.push("", c.date);
     details.forEach(function (d) { t.push(d); });
-    var keys = (ceremony ? ["v1", "v2", "v3"] : []).concat(["e1", "e2", "e3", "e4"]);
+    var keys = (ceremony ? ["v1", "v2"] : []).concat(["e1", "e2", "e3", "e4"]);
     keys.forEach(function (k) { t.push(c.rows[k][0] + "  " + c.rows[k][1] + " - " + c.rows[k][2]); });
     t.push("", c.venueName, EMAIL_ADDRESS, c.venueNote, EMAIL_MAP_URL);
   }
   t.push("", c.editHead, o.editUrl, c.editNote);
   return { subject: c.subject, html: html, text: t.join("\n") };
+}
+
+// ---------------------------------------------------------------------------------------------
+// One-off correction email: sent (via sendTimeUpdate in Code.gs) to ceremony guests whose first
+// confirmation carried the old afternoon times. Same air-mail look. lang "vi" or "en" gives one
+// language; anything else gives both, Vietnamese first (old sheet rows never recorded a language).
+// buildUpdateEmail_({lang, editUrl, calUrl}) -> {subject, html, text}
+// ---------------------------------------------------------------------------------------------
+var UPDATE_COPY = {
+  en: {
+    subject: "Updated afternoon timing — Zack & Louise",
+    head: "A small change", sub: "We’ve adjusted the timing of the afternoon vow ceremony. The new times are below.",
+    was: "Was", now: "Now", tbc: "to be confirmed",
+    rows: [["Welcoming guests", "15:00", "16:00"], ["Vow ceremony", "16:00", "16:30"], ["Photos", "16:40", null]],
+    evening: "The evening programme is unchanged, from 18:00.",
+    calNote: "If you already added us to your calendar, please delete the old entry and add the new one.",
+    cal: "Add to calendar"
+  },
+  vi: {
+    subject: "Cập nhật giờ buổi chiều — Nhân & Ngân",
+    head: "Điều chỉnh nhỏ", sub: "Chúng mình có điều chỉnh giờ buổi lễ trao lời thề buổi chiều. Giờ mới như bên dưới.",
+    was: "Giờ cũ", now: "Giờ mới", tbc: "sẽ báo sau",
+    rows: [["Đón khách", "15:00", "16:00"], ["Lễ trao lời thề", "16:00", "16:30"], ["Chụp ảnh", "16:40", null]],
+    evening: "Chương trình buổi tối giữ nguyên, từ 18:00.",
+    calNote: "Nếu bạn đã thêm vào lịch, vui lòng xóa mục cũ và thêm mục mới.",
+    cal: "Thêm vào lịch"
+  }
+};
+
+function emailUpdateSection_(lang, calUrl) {
+  var u = UPDATE_COPY[lang], C = EMAIL_C, serif = emailSerif_(lang), sans = "Helvetica,Arial,sans-serif";
+  var rows = "";
+  u.rows.forEach(function (r) {
+    rows += '<tr>' +
+      '<td valign="top" style="padding:10px 8px 10px 0;border-top:1px solid ' + C.hair + ';font-family:' + serif + ';font-size:16px;font-weight:bold;color:' + C.ink + ';">' + emailEsc_(r[0]) + '</td>' +
+      '<td valign="top" align="right" style="padding:10px 10px;border-top:1px solid ' + C.hair + ';white-space:nowrap;font-family:' + sans + ';font-size:14px;color:' + C.soft + ';text-decoration:line-through;">' + r[1] + '</td>' +
+      '<td valign="top" align="right" style="padding:10px 0 10px 10px;border-top:1px solid ' + C.hair + ';white-space:nowrap;font-family:' + serif + ';font-size:18px;font-weight:bold;color:' + C.lacquer + ';">' +
+        (r[2] ? r[2] : '<span style="font-family:' + sans + ';font-size:12px;font-weight:normal;color:' + C.soft + ';">' + emailEsc_(u.tbc) + '</span>') + '</td>' +
+      '</tr>';
+  });
+  var th = 'font-family:' + sans + ';font-size:11px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;';
+  return '<tr><td colspan="2" style="padding:22px 0 0;">' +
+      '<div align="center" style="font-family:' + serif + ';font-size:30px;line-height:34px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;color:' + C.lacquer + ';">' + emailEsc_(u.head) + '</div>' +
+      '<div align="center" style="font-family:' + serif + ';font-size:16px;font-style:italic;line-height:24px;color:' + C.soft + ';padding-top:8px;">' + emailEsc_(u.sub) + '</div>' +
+      '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:16px;border:1px solid ' + C.hair + ';background:' + C.paper + ';"><tr><td style="padding:4px 16px 8px;">' +
+        '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">' +
+          '<tr><td style="padding:10px 0 4px;' + th + '">&nbsp;</td>' +
+              '<td align="right" style="padding:10px 10px 4px;' + th + 'color:' + C.soft + ';">' + emailEsc_(u.was) + '</td>' +
+              '<td align="right" style="padding:10px 0 4px 10px;' + th + 'color:' + C.palm + ';">' + emailEsc_(u.now) + '</td></tr>' +
+          rows +
+        '</table></td></tr></table>' +
+      '<div align="center" style="font-family:' + sans + ';font-size:14px;line-height:21px;color:' + C.ink + ';padding-top:14px;">' + emailEsc_(u.evening) + '</div>' +
+      '<div align="center" style="font-family:' + sans + ';font-size:13px;line-height:19px;color:' + C.soft + ';padding-top:8px;">' + emailEsc_(u.calNote) + '</div>' +
+      '<div align="center" style="padding-top:14px;">' + emailButton_(calUrl, u.cal, false) + '</div>' +
+    '</td></tr>';
+}
+
+function buildUpdateEmail_(o) {
+  var langs = o.lang === "vi" ? ["vi"] : o.lang === "en" ? ["en"] : ["vi", "en"];
+  var C = EMAIL_C, sans = "Helvetica,Arial,sans-serif";
+  var sections = langs.map(function (l, i) {
+    var calUrl = o.calUrl || emailCalUrl_(l, true);
+    return (i ? '<tr><td colspan="2" style="padding:26px 0 0;"><div style="border-top:1px solid ' + C.hair + ';font-size:0;line-height:0;">&nbsp;</div></td></tr>' : "") + emailUpdateSection_(l, calUrl);
+  }).join("");
+  var editLabel = langs.map(function (l) { return EMAIL_COPY[l].editBtn; }).join(" / ");
+  var subject = langs.length === 1 ? UPDATE_COPY[langs[0]].subject : "Cập nhật giờ buổi chiều · Updated afternoon timing — Nhân & Ngân / Zack & Louise";
+  var foot = langs.length === 1 ? EMAIL_COPY[langs[0]].foot : "Nhân & Ngân · Zack & Louise · 12 · XII · 2026";
+  var html =
+    '<!DOCTYPE html><html lang="' + langs[0] + '"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
+    '<meta name="color-scheme" content="light"><meta name="supported-color-schemes" content="light"><title>' + emailEsc_(subject) + '</title></head>' +
+    '<body style="margin:0;padding:0;background:' + C.palm + ';">' +
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:' + C.palm + ';"><tr><td align="center" style="padding:24px 12px;">' +
+      '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background:' + C.ivory + ';border-collapse:collapse;">' +
+        '<tr><td>' + emailStripe_() + '</td></tr>' +
+        '<tr><td style="padding:22px 26px 26px;">' +
+          '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">' +
+            '<tr><td colspan="2" style="font-family:' + sans + ';font-size:11px;font-weight:bold;letter-spacing:2.5px;text-transform:uppercase;color:' + C.lacquer + ';">' + emailEsc_(EMAIL_COPY[langs[0]].airmail) + '&nbsp;&#9992;&#xFE0E;</td></tr>' +
+            sections +
+            '<tr><td colspan="2" align="center" style="padding:28px 0 0;">' + emailButton_(o.editUrl, editLabel, true) + '</td></tr>' +
+            '<tr><td colspan="2" align="center" style="padding:24px 0 0;font-family:' + sans + ';font-size:11px;font-weight:bold;letter-spacing:2.5px;text-transform:uppercase;color:' + C.gold + ';">&hearts;&nbsp;' + emailEsc_(foot) + '&nbsp;&hearts;</td></tr>' +
+          '</table>' +
+        '</td></tr>' +
+        '<tr><td>' + emailStripe_() + '</td></tr>' +
+      '</table>' +
+    '</td></tr></table></body></html>';
+
+  var t = [];
+  langs.forEach(function (l) {
+    var u = UPDATE_COPY[l];
+    if (t.length) t.push("", "----------");
+    t.push(u.head, u.sub, "");
+    u.rows.forEach(function (r) { t.push(r[0] + ": " + r[1] + " -> " + (r[2] || u.tbc)); });
+    t.push("", u.evening, u.calNote, o.calUrl || emailCalUrl_(l, true));
+  });
+  t.push("", editLabel, o.editUrl);
+  return { subject: subject, html: html, text: t.join("\n") };
 }

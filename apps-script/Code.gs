@@ -10,8 +10,13 @@
  * (resubmitting with the same email edits that row). The header row is rewritten to match
  * RSVP_HEADERS on every call, so new columns only ever get added to the right:
  *   Email | Updated | Code | Tier | Ceremony | Attending | Name | Plus-one name | Note |
- *   Joining | Plus-one | Plus-one joining | Ceremony headcount | Evening headcount
+ *   Joining | Plus-one | Plus-one joining | Ceremony headcount | Evening headcount | Lang | Time update
  * Old rows keep working; their new columns are just blank.
+ *
+ * "Time update" tracks the one-off correction email for the afternoon times that changed on 11 Nov
+ * (see previewTimeUpdate / sendTimeUpdate at the bottom): blank = still needs it, otherwise it says
+ * why not or when it was sent. Anyone who submits after this version is deployed already got the new
+ * times, so their row is marked TIME_UPDATE_NOT_NEEDED.
  *
  * Deploy: Deploy > Manage deployments > edit > New version (Execute as: Me, Access: Anyone).
  */
@@ -19,7 +24,9 @@
 var DEADLINE = new Date("2026-11-15T23:59:59+07:00"); // end of 15 Nov, Saigon time
 var SITE_URL = "https://lenhan1000.github.io/wedding-site/"; // used in the confirmation email edit link (keep the trailing slash)
 var RSVP_HEADERS = ["Email", "Updated", "Code", "Tier", "Ceremony", "Attending", "Name", "Plus-one name", "Note",
-                    "Joining", "Plus-one", "Plus-one joining", "Ceremony headcount", "Evening headcount"];
+                    "Joining", "Plus-one", "Plus-one joining", "Ceremony headcount", "Evening headcount", "Lang", "Time update"];
+var TIME_UPDATE_COL = RSVP_HEADERS.length;               // 1-based column of "Time update"
+var TIME_UPDATE_NOT_NEEDED = "Not needed (replied after the change)";
 
 function json_(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
@@ -105,7 +112,8 @@ function doPost(e) {
     var sh = rsvpSheet_();
     var row = [email, new Date(), clean_(data.code, 40), clean_(data.tier, 40) || "Guest", ceremonyTier ? "Yes" : "No",
                attending, name, plusName, clean_(data.note, 2000),
-               joining, bringing, plusJoining, ceremonyCount, eveningCount];
+               joining, bringing, plusJoining, ceremonyCount, eveningCount,
+               data.lang === "vi" ? "vi" : "en", TIME_UPDATE_NOT_NEEDED];
     var existing = findRsvp_(sh, email);
     if (existing) sh.getRange(existing.rowIndex, 1, 1, row.length).setValues([row]);
     else sh.appendRow(row);
@@ -141,4 +149,64 @@ function sendConfirmation_(row, lang) {
 // every confirmation email fails and the form says "couldn't send the confirmation email".
 function authorizeMail() {
   MailApp.sendEmail(Session.getActiveUser().getEmail(), "RSVP mail test", "Mail permission works.");
+}
+
+// ---------------------------------------------------------------------------------------------
+// One-off: correction email for the afternoon times that changed (welcome 15:00 -> 16:00, vows
+// 16:00 -> 16:30, photos dropped). Run these from the editor, in this order:
+//   1. sendTimeUpdateTest()   emails ONE sample to yourself so you can look at it.
+//   2. previewTimeUpdate()    lists who would get it (View > Logs / Execution log). Sends nothing.
+//   3. sendTimeUpdate()       sends it, and stamps each row so a second run does nothing.
+// Recipients: attending guests whose "Time update" cell is blank and who joined the ceremony (or whose
+// older row has no Joining answer but whose code includes the ceremony).
+// ---------------------------------------------------------------------------------------------
+function timeUpdateRecipients_() {
+  var sh = rsvpSheet_(), out = [];
+  if (sh.getLastRow() < 2) return out;
+  var rows = sh.getRange(2, 1, sh.getLastRow() - 1, RSVP_HEADERS.length).getValues();
+  rows.forEach(function (v, i) {
+    var joinedCeremony = v[9] === "ceremony" || (!v[9] && v[4] === "Yes");
+    if (v[5] === "Yes" && joinedCeremony && !v[TIME_UPDATE_COL - 1] && normEmail_(v[0])) {
+      out.push({ rowNumber: i + 2, email: String(v[0]).trim(), code: v[2], lang: v[14] === "vi" || v[14] === "en" ? v[14] : "" });
+    }
+  });
+  return out;
+}
+
+function timeUpdateMessage_(r) {
+  var editUrl = SITE_URL + "?" + (r.code ? "c=" + encodeURIComponent(r.code) + "&" : "") + "e=" + encodeURIComponent(r.email) + "#rsvp";
+  return buildUpdateEmail_({ lang: r.lang, editUrl: editUrl });
+}
+
+function sendTimeUpdateMail_(to, m, lang) {
+  MailApp.sendEmail({ to: to, subject: m.subject, body: m.text, htmlBody: m.html,
+                      name: lang === "en" ? "Zack & Louise" : "Nhân & Ngân" });
+}
+
+function sendTimeUpdateTest() {
+  var me = Session.getActiveUser().getEmail();
+  var m = timeUpdateMessage_({ email: me, code: "", lang: "" });
+  sendTimeUpdateMail_(me, m, "");
+  console.log("Sample sent to " + me + " (both languages, as old rows without a language would receive).");
+}
+
+function previewTimeUpdate() {
+  var list = timeUpdateRecipients_();
+  console.log(list.length + " guest(s) would get the time update. Mail quota left today: " + MailApp.getRemainingDailyQuota() + ".");
+  list.forEach(function (r) { console.log("row " + r.rowNumber + "  " + r.email + "  (" + (r.lang || "both languages") + ")"); });
+}
+
+function sendTimeUpdate() {
+  var list = timeUpdateRecipients_();
+  var quota = MailApp.getRemainingDailyQuota();
+  if (list.length > quota) { console.error("Not sending: " + list.length + " emails but only " + quota + " left in today's quota. Run again tomorrow."); return; }
+  var sh = rsvpSheet_(), sent = 0, failed = [];
+  list.forEach(function (r) {
+    try {
+      sendTimeUpdateMail_(r.email, timeUpdateMessage_(r), r.lang);
+      sh.getRange(r.rowNumber, TIME_UPDATE_COL).setValue("Sent " + new Date().toISOString().slice(0, 10));
+      sent++;
+    } catch (err) { failed.push(r.email + ": " + err); }
+  });
+  console.log("Sent " + sent + " of " + list.length + "." + (failed.length ? " Failed: " + failed.join("; ") : ""));
 }
