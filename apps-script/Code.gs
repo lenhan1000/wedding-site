@@ -21,7 +21,7 @@
  * Deploy: Deploy > Manage deployments > edit > New version (Execute as: Me, Access: Anyone).
  */
 
-var DEADLINE = new Date("2026-11-15T23:59:59+07:00"); // end of 15 Nov, Saigon time
+var DEADLINE = new Date("2026-12-05T23:59:59+07:00"); // end of 5 Dec, Saigon time
 var SITE_URL = "https://lenhan1000.github.io/wedding-site/"; // used in the confirmation email edit link (keep the trailing slash)
 var RSVP_HEADERS = ["Email", "Updated", "Code", "Tier", "Ceremony", "Attending", "Name", "Plus-one name", "Note",
                     "Joining", "Plus-one", "Plus-one joining", "Ceremony headcount", "Evening headcount", "Lang", "Time update"];
