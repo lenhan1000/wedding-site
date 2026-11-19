@@ -41,7 +41,7 @@ var EMAIL_COPY = {
     venueLabel: "The venue", venueName: "The Sunset Garden — Chloe Gallery",
     venueNote: "Outdoors, in an open-air hall. Flats or block heels are easier than stilettos.",
     map: "Open in Maps", cal: "Add to calendar",
-    editHead: "Need to change something?", editBtn: "Edit your reply", editNote: "Until 5 December 2026, using this same link.",
+    editHead: "Need to change something?", editBtn: "Edit your reply", editNote: "Until 12 December 2026, using this same link.",
     foot: "Zack & Louise · 12 · XII · 2026"
   },
   vi: {
@@ -67,7 +67,7 @@ var EMAIL_COPY = {
     venueLabel: "Địa điểm", venueName: "Sunset Garden — Chloe Gallery",
     venueNote: "Ngoài trời, trong sảnh mở. Giày bệt hoặc gót vuông sẽ thoải mái hơn gót nhọn.",
     map: "Mở bản đồ", cal: "Thêm vào lịch",
-    editHead: "Cần thay đổi?", editBtn: "Chỉnh sửa phản hồi", editNote: "Đến hết ngày 5/12/2026, dùng lại đường dẫn này.",
+    editHead: "Cần thay đổi?", editBtn: "Chỉnh sửa phản hồi", editNote: "Đến hết ngày 12/12/2026, dùng lại đường dẫn này.",
     foot: "Nhân & Ngân · 12 · XII · 2026"
   }
 };
